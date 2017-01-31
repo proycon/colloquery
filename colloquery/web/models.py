@@ -7,6 +7,9 @@ class Collection(models.model):
     sourcelanguage = models.CharField(max_length=3)
     targetlanguage = models.CharField(max_length=3)
 
+    def __str__(self):
+        return self.name
+
 class Collocation(models.Model):
     collection = models.IntegerField()
     language = models.CharField(max_length=3)
@@ -18,9 +21,15 @@ class Collocation(models.Model):
         unique_together = (("collection","language","text"),)
         index_together = (("collection","language","text"),)
 
+    def __str__(self):
+        return self.text
+
 class Keyword(models.Model):
     text = models.CharField(max_length=60)
     collocations = models.ManyToManyField(Collocation)
+
+    def __str__(self):
+        return self.text
 
 class Translation(models.Model):
     source = models.ForeignKey(Collocation, on_delete=models.CASCADE)
