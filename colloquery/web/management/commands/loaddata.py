@@ -81,7 +81,7 @@ class Command(BaseCommand):
         alignmodel = colibricore.PatternAlignmentModel_float(alignmodelfile, modeloptions)
         self.stdout.write(self.style.SUCCESS('DONE'))
 
-        collection = Collection.objects.get_or_create(name=options.title, sourcelanguage=options.sourcelang, targetlanguage=options.targetlang)
+        collection = Collection.objects.get_or_create(name=options['title'], sourcelanguage=options['sourcelang'], targetlanguage=options['argetlang'])
         self.stdout.write(self.style.SUCCESS('Created collection'))
 
         self.stdout.write("Loading translation pairs (this may take a while)..." )
@@ -90,15 +90,15 @@ class Command(BaseCommand):
                 self.stdout.write("Added " + str(i+1) + " pairs")
 
             sourcefreq = sourcemodel[sourcepattern]
-            source = Collocation.objects.get_or_create(collection=collection, language=options.sourcelang, text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
+            source = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
             for wordpattern in sourcepattern.ngrams(1):
-                keyword = Keyword.objects.get_or_create(text=wordpattern.tostring(sourceclassdecoder), language=options.sourcelang, collection=collection)
+                keyword = Keyword.objects.get_or_create(text=wordpattern.tostring(sourceclassdecoder), language=options['sourcelang'], collection=collection)
                 keyword.add(source)
 
             targetfreq = targetmodel[targetpattern]
-            target = Collocation.objects.get_or_create(collection=collection, language=options.targetlang, text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
+            target = Collocation.objects.get_or_create(collection=collection, language=options['targetlang'], text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
             for wordpattern in targetpattern.ngrams(1):
-                keyword = Keyword.objects.get_or_create(text=wordpattern.tostring(targetclassdecoder), language=options.targetlang, collection=collection)
+                keyword = Keyword.objects.get_or_create(text=wordpattern.tostring(targetclassdecoder), language=options['targetlang'], collection=collection)
                 keyword.add(target)
 
             source.translations.create(target, prob=scores[0],  reverseprob=scores[2])
