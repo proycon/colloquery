@@ -39,5 +39,5 @@ class Keyword(models.Model):
 class Translation(models.Model):
     source = models.ForeignKey(Collocation, on_delete=models.CASCADE)
     target = models.ForeignKey(Collocation, on_delete=models.CASCADE)
-    prob = models.FloatField() #p(pattern1|pattern2)
-    reverseprob = models.FloatField() #p(pattern2|pattern1)
+    prob = models.FloatField() #p(target|source)
+    reverseprob = models.FloatField() #p(source|target)

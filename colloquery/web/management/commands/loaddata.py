@@ -21,6 +21,10 @@ class Command(BaseCommand):
         parser.add_argument('--sourcecorpus', type=str,help="Corpus file 1", action='store',required=True)
         parser.add_argument('--targetcorpus', type=str,help="Corpus file 2", action='store',required=True)
         parser.add_argument('--freqthreshold', type=int,help="Minimum frequency threshold", action='store',default=2,required=True)
+        parser.add_argument('--pts', type=float,help="p(target|source) threshold", action='store',default=0)
+        parser.add_argument('--pst', type=float,help="p(source|target) threshold", action='store',default=0)
+        parser.add_argument('--joinedthreshold', type=float,help="p(source|target) * p(target|source) threshold", action='store',default=0)
+        parser.add_argument('--divergencethreshold', type=float,help="Divergence from best threshold: prunes translation options lower than set threshold times the strongest translation options (prunes weaker alternatives)", action='store',default=0)
         parser.add_argument('--maxlength', type=int,help="Maximum collocation size", action='store',default=8,required=True)
         parser.add_argument('--tmpdir', type=str,help="Temporary directory", action='store',default=os.env['TMPDIR'] if 'TMPDIR' in os.env else "/tmp")
 
@@ -67,7 +71,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Unloaded patternmodels'))
 
         self.stdout.write("Computing alignment model")
-        os.system("colibri-mosesphrasetable2alignmodel -i " + args.phrasetable + " -o " + alignmodelfile + " -S " + sourceclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(args.freqthreshold) + " -l " + str(args.maxlength) )
+        os.system("colibri-mosesphrasetable2alignmodel -i " + args.phrasetable + " -o " + alignmodelfile + " -S " + sourceclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(args.freqthreshold) + " -l " + str(args.maxlength) + " -p " + str(args.pts) + " -P " + str(arg.pst) + " -j " + str(args.joinedthreshold) + " -d " + str(args.divergencethreshold))
         self.stdout.write(self.style.SUCCESS('DONE'))
 
         self.stdout.write("Loading models")
