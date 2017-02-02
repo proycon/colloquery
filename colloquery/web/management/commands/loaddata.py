@@ -102,7 +102,7 @@ class Command(BaseCommand):
                 keyword = Keyword.objects.get_or_create(text=wordpattern.tostring(targetclassdecoder), language=args.targetlang, collection=collection)
                 keyword.add(target)
 
-            source.translations.create(target, prob=scores[0],  reverseprob=scores[1])
+            source.translations.create(target, prob=scores[0],  reverseprob=scores[2])
 
         self.stdout.write(self.style.SUCCESS('Added ' + str(i+1) + ' translation pairs to the database'))
 
