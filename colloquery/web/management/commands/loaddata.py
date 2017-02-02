@@ -8,6 +8,7 @@ import argparse
 import os
 import colibricore
 from django.core.management.base import BaseCommand, CommandError
+from colloquery.web.models import Collection, Collocation, Keyword, Translation
 
 class Command(BaseCommand):
     help = "Compute and load collocation data into the database"
@@ -61,7 +62,7 @@ class Command(BaseCommand):
         del targetmodel
         self.stdout.write(self.style.SUCCESS('Unloaded patternmodels'))
 
-        os.system("colibri-mosesphrasetable2alignmodel -i " + args.phrasetable + " -o " + alignmodelfile + " -S " + soureclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(args.freqthreshold) + " -l " + str(args.maxlength) )
+        os.system("colibri-mosesphrasetable2alignmodel -i " + args.phrasetable + " -o " + alignmodelfile + " -S " + sourceclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(args.freqthreshold) + " -l " + str(args.maxlength) )
         self.stdout.write(self.style.SUCCESS('Computed alignment model'))
 
         sourcemodel = colibricore.UnindexedPatternModel(sourcemodelfile)
@@ -70,6 +71,10 @@ class Command(BaseCommand):
 
         alignmodel = colibricore.PatternAlignmentModel_float(alignmodelfile)
         self.stdout.write(self.style.SUCCESS('Loaded alignment model'))
+
+        for sourcepattern, targetpattern, scores in alignmodel.triples():
+    
+
 
 
 
