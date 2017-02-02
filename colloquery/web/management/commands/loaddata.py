@@ -71,7 +71,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Unloaded patternmodels'))
 
         self.stdout.write("Computing alignment model")
-        os.system("colibri-mosesphrasetable2alignmodel -i " + args.phrasetable + " -o " + alignmodelfile + " -S " + sourceclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(args.freqthreshold) + " -l " + str(args.maxlength) + " -p " + str(args.pts) + " -P " + str(arg.pst) + " -j " + str(args.joinedthreshold) + " -d " + str(args.divergencethreshold))
+        os.system("colibri-mosesphrasetable2alignmodel -i " + args.phrasetable + " -o " + alignmodelfile + " -S " + sourceclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(args.freqthreshold) + " -l " + str(args.maxlength) + " -p " + str(args.pts) + " -P " + str(args.pst) + " -j " + str(args.joinedthreshold) + " -d " + str(args.divergencethreshold))
         self.stdout.write(self.style.SUCCESS('DONE'))
 
         self.stdout.write("Loading models")
