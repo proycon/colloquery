@@ -11,9 +11,12 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from socket import gethostname
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+hostname = gethostname()
 
 
 # Quick-start development settings - unsuitable for production
@@ -21,6 +24,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'tgl20q16fg!)xfl3xqta(i+lvr!k22^^uknu2_r5s$dmfqkvpz'
+#TODO
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -74,12 +78,16 @@ WSGI_APPLICATION = 'colloquery.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if hostname[:9] == "applejack":
+    #TODO
+    pass
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
 
 
 # Password validation

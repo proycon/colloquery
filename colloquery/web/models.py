@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Collection(models.model):
+class Collection(models.Model):
     name = models.CharField(max_length=50)
     sourcelanguage = models.CharField(max_length=3)
     targetlanguage = models.CharField(max_length=3)
@@ -37,7 +37,7 @@ class Keyword(models.Model):
         index_together = (("collection","language","text"),)
 
 class Translation(models.Model):
-    source = models.ForeignKey(Collocation, on_delete=models.CASCADE)
-    target = models.ForeignKey(Collocation, on_delete=models.CASCADE)
+    source = models.ForeignKey(Collocation, on_delete=models.CASCADE, related_name="rev_source")
+    target = models.ForeignKey(Collocation, on_delete=models.CASCADE, related_name="rev_target")
     prob = models.FloatField() #p(target|source)
     reverseprob = models.FloatField() #p(source|target)
