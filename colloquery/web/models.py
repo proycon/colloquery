@@ -2,7 +2,6 @@ from django.db import models
 
 
 class Collection(models.model):
-    collection = models.IntegerField()
     name = models.CharField(max_length=50)
     sourcelanguage = models.CharField(max_length=3)
     targetlanguage = models.CharField(max_length=3)
@@ -11,7 +10,7 @@ class Collection(models.model):
         return self.name
 
 class Collocation(models.Model):
-    collection = models.IntegerField()
+    collection = models.ForeignKey(Collection)
     language = models.CharField(max_length=3)
     text = models.CharField(max_length=125)
     freq = models.IntegerField() #occurrence frequency (absolute)
@@ -25,6 +24,7 @@ class Collocation(models.Model):
         return self.text
 
 class Keyword(models.Model):
+    collection = models.ForeignKey(Collection)
     text = models.CharField(max_length=60)
     collocations = models.ManyToManyField(Collocation)
 
