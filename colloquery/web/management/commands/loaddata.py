@@ -85,20 +85,25 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Created collection'))
 
         self.stdout.write("Loading translation pairs (this may take a while)..." )
+        n_target = n_source = n_source_keywords = n_target_keywords = 0
         for i, (sourcepattern, targetpattern, scores) in enumerate(alignmodel.triples()):
             if i % 100 == 0:
-                self.stdout.write("Added " + str(i+1) + " pairs")
+                self.stdout.write("Added " + str(i+1) + " pairs (source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
 
             sourcefreq = sourcemodel[sourcepattern]
-            source,_  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
+            source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
+            n_source += int(created)
             for wordpattern in sourcepattern.ngrams(1):
-                keyword,_ = Keyword.objects.get_or_create(text=wordpattern.tostring(sourceclassdecoder), language=options['sourcelang'], collection=collection)
+                keyword,created = Keyword.objects.get_or_create(text=wordpattern.tostring(sourceclassdecoder), language=options['sourcelang'], collection=collection)
+                n_source_keywords += int(created)
                 keyword.collocations.add(source)
 
             targetfreq = targetmodel[targetpattern]
-            target,_ = Collocation.objects.get_or_create(collection=collection, language=options['targetlang'], text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
+            target,created = Collocation.objects.get_or_create(collection=collection, language=options['targetlang'], text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
+            n_target += int(created)
             for wordpattern in targetpattern.ngrams(1):
-                keyword,_ = Keyword.objects.get_or_create(text=wordpattern.tostring(targetclassdecoder), language=options['targetlang'], collection=collection)
+                keyword,created = Keyword.objects.get_or_create(text=wordpattern.tostring(targetclassdecoder), language=options['targetlang'], collection=collection)
+                n_target_keywords += int(created)
                 keyword.collocations.add(target)
 
             Translation.objects.create(source=source,target=target, prob=scores[0],  reverseprob=scores[2])
