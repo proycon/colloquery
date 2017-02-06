@@ -120,7 +120,7 @@ class Command(BaseCommand):
 
                 sourcefreq = sourcemodel[sourcepattern]
                 collocation_id += 1
-                f.write("INSERT INTO `web_collocation` (`id`,`collection`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ") ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                f.write("INSERT INTO `web_collocation` (`id`,`collection`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ") ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
                 #source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
 
                 #n_source += int(created)
@@ -144,7 +144,7 @@ class Command(BaseCommand):
                 else:
                     collocation_id += 1
                     targetcollocations.add(targetpattern, collocation_id)
-                    f.write("INSERT INTO `web_collocation` (`id`,`collection`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + sqlescape(targetpattern.tostring(targetclassdecoder)) + "\"," + str(targetfreq) + ") ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                    f.write("INSERT INTO `web_collocation` (`id`,`collection`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + options['targetlang'] + "\",\"" + sqlescape(targetpattern.tostring(targetclassdecoder)) + "\"," + str(targetfreq) + ") ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
 
                 #target,created = Collocation.objects.get_or_create(collection=collection, language=options['targetlang'], text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
                 #n_target += int(created)
