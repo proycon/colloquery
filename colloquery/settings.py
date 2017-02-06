@@ -85,7 +85,7 @@ if hostname[:9] == "applejack":
 	'NAME': 'colloquery',                      # Or path to database file if using sqlite3.
 	'USER': 'colloquery_admin',
 	'PASSWORD': open('/scratch2/www/colloquery/.pw').read().strip(),
-	'HOST': 'applejack.science.ru.nl',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+	'HOST': 'spitfire.science.ru.nl',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
 	'PORT': '',                      # Set to empty string for default.
       }
     }
