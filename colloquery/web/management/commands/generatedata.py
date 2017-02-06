@@ -112,15 +112,18 @@ class Command(BaseCommand):
         sourcekeywords = colibricore.UnindexedPatternModel() #maps keyword text to primary key
         targetkeywords = colibricore.UnindexedPatternModel()  #maps keyword text to primary key
         targetcollocations = colibricore.UnindexedPatternModel()  #maps collocation text to primary key
+        prevsourcepattern = None
         with open(options['out'], 'w', encoding='utf-8') as f:
             f.write("SET NAMES utf8;\n")
             for i, (sourcepattern, targetpattern, scores) in enumerate(alignmodel.triples()):
                 if i % 10000 == 0:
                     self.stdout.write("Generated " + str(i+1) + " pairs") #(source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
 
-                sourcefreq = sourcemodel[sourcepattern]
-                collocation_id += 1
-                f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ") ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                if prevsourcepattern is None or sourcepattern != prevsourcepattern:
+                    collocation_id += 1
+                    sourcefreq = sourcemodel[sourcepattern]
+                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ") ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                    prevsourcepattern = sourcepattern
                 #source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
 
                 #n_source += int(created)
