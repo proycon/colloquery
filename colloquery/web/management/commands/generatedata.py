@@ -115,8 +115,8 @@ class Command(BaseCommand):
         with open(options['out'], 'w', encoding='utf-8') as f:
             f.write("SET NAMES utf8;\n")
             for i, (sourcepattern, targetpattern, scores) in enumerate(alignmodel.triples()):
-                if i % 100 == 0:
-                    self.stdout.write("Added " + str(i+1) + " pairs") #(source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
+                if i % 10000 == 0:
+                    self.stdout.write("Generated " + str(i+1) + " pairs") #(source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
 
                 sourcefreq = sourcemodel[sourcepattern]
                 collocation_id += 1
