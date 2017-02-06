@@ -79,8 +79,16 @@ WSGI_APPLICATION = 'colloquery.wsgi.application'
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
 if hostname[:9] == "applejack":
-    #TODO
-    pass
+    DATABASES = {
+      'default': {
+	'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+	'NAME': 'colloquery',                      # Or path to database file if using sqlite3.
+	'USER': 'colloquery_admin',
+	'PASSWORD': open('/scratch2/www/colloquery/.pw').read().strip(),
+	'HOST': 'applejack.science.ru.nl',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+	'PORT': '',                      # Set to empty string for default.
+      }
+    }
 else:
     DATABASES = {
         'default': {
