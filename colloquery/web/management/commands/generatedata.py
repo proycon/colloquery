@@ -123,7 +123,6 @@ class Command(BaseCommand):
                     collocation_id += 1
                     sourcefreq = sourcemodel[sourcepattern]
                     f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
-                    prevsourcepattern = sourcepattern
                     #source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
 
                     #n_source += int(created)
@@ -139,16 +138,18 @@ class Command(BaseCommand):
                         # n_source_keywords += int(created)
                         #keyword.collocations.add(source)
 
+                    prevsourcepattern = sourcepattern
                     source_collocation_id = collocation_id
 
 
                 targetfreq = targetmodel[targetpattern]
                 if targetpattern in targetcollocations:
-                    collocation_id = targetcollocations[targetpattern]
+                    target_collocation_id = targetcollocations[targetpattern]
                 else:
                     collocation_id += 1
+                    target_collocation_id = collocation_id
                     targetcollocations.add(targetpattern, collocation_id)
-                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + options['targetlang'] + "\",\"" + sqlescape(targetpattern.tostring(targetclassdecoder)) + "\"," + str(targetfreq) + ")\n;") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(target_collocation_id)+","+str(collection.id)+",\"" + options['targetlang'] + "\",\"" + sqlescape(targetpattern.tostring(targetclassdecoder)) + "\"," + str(targetfreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
 
                 #target,created = Collocation.objects.get_or_create(collection=collection, language=options['targetlang'], text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
                 #n_target += int(created)
@@ -159,14 +160,14 @@ class Command(BaseCommand):
                         targetkeywords.add(wordpattern, keywords_id)
                         f.write("INSERT INTO `web_keyword` (`id`,`collection_id`,`language`,`text`) VALUES ("+str(targetkeywords[wordpattern])+","+str(collection.id)+",\"" + options['targetlang'] + "\",\"" + sqlescape(text) + "\");\n")
                     keyword_collocations_id += 1
-                    f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(targetkeywords[wordpattern])+"," + str(collocation_id) + ") ON DUPLICATE KEY UPDATE `collocation_id`=`collocation_id`;\n")
+                    f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(targetkeywords[wordpattern])+"," + str(target_collocation_id) + ") ON DUPLICATE KEY UPDATE `collocation_id`=`collocation_id`;\n")
 
                     #keyword,created = Keyword.objects.get_or_create(text=wordpattern.tostring(targetclassdecoder), language=options['targetlang'], collection=collection)
                     #n_target_keywords += int(created)
                     #keyword.collocations.add(target)
 
                 translation_id += 1
-                f.write("INSERT INTO `web_translation` (`id`,`source_id`,`target_id`) VALUES ("+str(translation_id)+","+str(source_collocation_id)+"," + str(collocation_id) + ");\n")
+                f.write("INSERT INTO `web_translation` (`id`,`source_id`,`target_id`) VALUES ("+str(translation_id)+","+str(source_collocation_id)+"," + str(target_collocation_id) + ");\n")
 
 
                 #Translation.objects.create(source=source,target=target, prob=scores[0],  reverseprob=scores[2])
