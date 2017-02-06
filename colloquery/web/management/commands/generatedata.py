@@ -124,22 +124,23 @@ class Command(BaseCommand):
                     sourcefreq = sourcemodel[sourcepattern]
                     f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ") ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
                     prevsourcepattern = sourcepattern
-                #source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
+                    #source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
 
-                #n_source += int(created)
-                for wordpattern in sourcepattern.ngrams(1):
-                    text = wordpattern.tostring(sourceclassdecoder)
-                    if wordpattern not in sourcekeywords:
-                        keywords_id += 1
-                        sourcekeywords.add(wordpattern, keywords_id)
-                        f.write("INSERT INTO `web_keyword` (`id`,`collection_id`,`language`,`text`) VALUES ("+str(sourcekeywords[wordpattern])+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(text) + "\");\n")
-                    keyword_collocations_id += 1
-                    f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(sourcekeywords[wordpattern])+"," + str(collocation_id) + ");\n")
-                    #keyword,created = Keyword.objects.get_or_create(text=text, language=options['sourcelang'], collection=collection)
-                    # n_source_keywords += int(created)
-                    #keyword.collocations.add(source)
+                    #n_source += int(created)
+                    for wordpattern in sourcepattern.ngrams(1):
+                        text = wordpattern.tostring(sourceclassdecoder)
+                        if wordpattern not in sourcekeywords:
+                            keywords_id += 1
+                            sourcekeywords.add(wordpattern, keywords_id)
+                            f.write("INSERT INTO `web_keyword` (`id`,`collection_id`,`language`,`text`) VALUES ("+str(sourcekeywords[wordpattern])+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(text) + "\");\n")
+                        keyword_collocations_id += 1
+                        f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(sourcekeywords[wordpattern])+"," + str(collocation_id) + ");\n")
+                        #keyword,created = Keyword.objects.get_or_create(text=text, language=options['sourcelang'], collection=collection)
+                        # n_source_keywords += int(created)
+                        #keyword.collocations.add(source)
 
-                source_collocation_id = collocation_id
+                    source_collocation_id = collocation_id
+
 
                 targetfreq = targetmodel[targetpattern]
                 if targetpattern in targetcollocations:
