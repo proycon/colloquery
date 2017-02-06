@@ -8,6 +8,7 @@ import argparse
 import os
 import colibricore
 from django.core.management.base import BaseCommand, CommandError
+from django.core.exceptions import ObjectDoesNotExist
 from colloquery.web.models import Collection, Collocation, Keyword, Translation
 
 
@@ -91,16 +92,28 @@ class Command(BaseCommand):
 
 
         self.stdout.write("Generating translation pairs (this may take a while)..." )
-        n_target = n_source = n_source_keywords = n_target_keywords = 0
 
-        collocation_id = 0
-        keywords_id = 0
-        keyword_collocations_id = 0
-        translation_id = 0
+        try:
+            collocation_id = Collocation.objects.latest('id').id
+        except ObjectDoesNotExist:
+            collocation_id = 0
+        try:
+            keywords_id = Keyword.objects.latest('id').id
+        except ObjectDoesNotExist:
+            keywords_id = 0
+        try:
+            translation_id = Translation.objects.latest('id').id
+        except ObjectDoesNotExist:
+            translation_id = 0
+        try:
+            keyword_collocations_id = Keyword.collocations.through.objects.latest('id').id
+        except ObjectDoesNotExist:
+            keyword_collocations_id = 0
         sourcekeywords = colibricore.UnindexedPatternModel() #maps keyword text to primary key
         targetkeywords = colibricore.UnindexedPatternModel()  #maps keyword text to primary key
         targetcollocations = colibricore.UnindexedPatternModel()  #maps collocation text to primary key
         with open(options['out'], 'w', encoding='utf-8') as f:
+            f.write("SET NAMES utf8;\n")
             for i, (sourcepattern, targetpattern, scores) in enumerate(alignmodel.triples()):
                 if i % 100 == 0:
                     self.stdout.write("Added " + str(i+1) + " pairs") #(source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
@@ -116,7 +129,7 @@ class Command(BaseCommand):
                     if wordpattern not in sourcekeywords:
                         keywords_id += 1
                         sourcekeywords.add(wordpattern, keywords_id)
-                    f.write("INSERT INTO `web_keyword` (`id`,`collection`,`language`,`text`) VALUES ("+str(sourcekeywords[wordpattern])+","+str(collection.id)+",\"" + options['sourcelang'] + ",\"" + sqlescape(text) + "\");\n")
+                    f.write("INSERT INTO `web_keyword` (`id`,`collection`,`language`,`text`) VALUES ("+str(sourcekeywords[wordpattern])+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(text) + "\");\n")
                     keyword_collocations_id += 1
                     f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(sourcekeywords[wordpattern])+"," + str(collocation_id) + ");\n")
                     #keyword,created = Keyword.objects.get_or_create(text=text, language=options['sourcelang'], collection=collection)
@@ -140,7 +153,7 @@ class Command(BaseCommand):
                     if wordpattern not in targetkeywords:
                         keywords_id += 1
                         targetkeywords.add(wordpattern, keywords_id)
-                    f.write("INSERT INTO `web_keyword` (`id`,`collection`,`language`,`text`) VALUES ("+str(targetkeywords[wordpattern])+","+str(collection.id)+",\"" + options['targetlang'] + ",\"" + sqlescape(text) + "\");\n")
+                    f.write("INSERT INTO `web_keyword` (`id`,`collection`,`language`,`text`) VALUES ("+str(targetkeywords[wordpattern])+","+str(collection.id)+",\"" + options['targetlang'] + "\",\"" + sqlescape(text) + "\");\n")
                     keyword_collocations_id += 1
                     f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(targetkeywords[wordpattern])+"," + str(collocation_id) + ");\n")
 
@@ -155,6 +168,7 @@ class Command(BaseCommand):
                 #Translation.objects.create(source=source,target=target, prob=scores[0],  reverseprob=scores[2])
 
             self.stdout.write(self.style.SUCCESS('Generated ' + str(i+1) + ' translation pairs for import into database'))
+            self.stdout.write("Now import manually using: mysql -u USERNAME -p DATABASE < " + options['out'] )
 
 
 
