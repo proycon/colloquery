@@ -10,6 +10,10 @@ import colibricore
 from django.core.management.base import BaseCommand, CommandError
 from colloquery.web.models import Collection, Collocation, Keyword, Translation
 
+
+def sqlescape(s):
+    return s.replace('"','\\"')
+
 class Command(BaseCommand):
     help = "Compute and load collocation data into the database"
 
@@ -27,6 +31,7 @@ class Command(BaseCommand):
         parser.add_argument('--divergencethreshold', type=float,help="Divergence from best threshold: prunes translation options lower than set threshold times the strongest translation options (prunes weaker alternatives)", action='store',default=0)
         parser.add_argument('--maxlength', type=int,help="Maximum collocation size", action='store',default=8)
         parser.add_argument('--tmpdir', type=str,help="Temporary directory", action='store',default=os.environ['TMPDIR'] if 'TMPDIR' in os.environ else "/tmp")
+        parser.add_argument('--out', type=str,help="Output to the following sql file", action='store',default="out.sql")
 
     def handle(self, *args, **options):
         self.stdout.write("Encoding source corpus ...")
@@ -84,31 +89,72 @@ class Command(BaseCommand):
         collection,_ = Collection.objects.get_or_create(name=options['title'], sourcelanguage=options['sourcelang'], targetlanguage=options['targetlang'])
         self.stdout.write(self.style.SUCCESS('Created collection'))
 
-        self.stdout.write("Loading translation pairs (this may take a while)..." )
+
+        self.stdout.write("Generating translation pairs (this may take a while)..." )
         n_target = n_source = n_source_keywords = n_target_keywords = 0
-        for i, (sourcepattern, targetpattern, scores) in enumerate(alignmodel.triples()):
-            if i % 100 == 0:
-                self.stdout.write("Added " + str(i+1) + " pairs (source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
 
-            sourcefreq = sourcemodel[sourcepattern]
-            source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
-            n_source += int(created)
-            for wordpattern in sourcepattern.ngrams(1):
-                keyword,created = Keyword.objects.get_or_create(text=wordpattern.tostring(sourceclassdecoder), language=options['sourcelang'], collection=collection)
-                n_source_keywords += int(created)
-                keyword.collocations.add(source)
+        collocation_id = 0
+        keywords_id = 0
+        keyword_collocations_id = 0
+        translation_id = 0
+        sourcekeywords = colibricore.UnindexedPatternModel() #maps keyword text to primary key
+        targetkeywords = colibricore.UnindexedPatternModel()  #maps keyword text to primary key
+        targetcollocations = colibricore.UnindexedPatternModel()  #maps collocation text to primary key
+        with open(options['out'], 'w', encoding='utf-8') as f:
+            for i, (sourcepattern, targetpattern, scores) in enumerate(alignmodel.triples()):
+                if i % 100 == 0:
+                    self.stdout.write("Added " + str(i+1) + " pairs") #(source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
 
-            targetfreq = targetmodel[targetpattern]
-            target,created = Collocation.objects.get_or_create(collection=collection, language=options['targetlang'], text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
-            n_target += int(created)
-            for wordpattern in targetpattern.ngrams(1):
-                keyword,created = Keyword.objects.get_or_create(text=wordpattern.tostring(targetclassdecoder), language=options['targetlang'], collection=collection)
-                n_target_keywords += int(created)
-                keyword.collocations.add(target)
+                sourcefreq = sourcemodel[sourcepattern]
+                collocation_id += 1
+                f.write("INSERT INTO `web_collocation` (`id`,`collection`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ") ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                #source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
 
-            Translation.objects.create(source=source,target=target, prob=scores[0],  reverseprob=scores[2])
+                #n_source += int(created)
+                for wordpattern in sourcepattern.ngrams(1):
+                    text = wordpattern.tostring(sourceclassdecoder)
+                    if wordpattern not in sourcekeywords:
+                        keywords_id += 1
+                        sourcekeywords.add(wordpattern, keywords_id)
+                    f.write("INSERT INTO `web_keyword` (`id`,`collection`,`language`,`text`) VALUES ("+str(sourcekeywords[wordpattern])+","+str(collection.id)+",\"" + options['sourcelang'] + ",\"" + sqlescape(text) + "\");\n")
+                    keyword_collocations_id += 1
+                    f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(sourcekeywords[wordpattern])+"," + str(collocation_id) + ");\n")
+                    #keyword,created = Keyword.objects.get_or_create(text=text, language=options['sourcelang'], collection=collection)
+                    # n_source_keywords += int(created)
+                    #keyword.collocations.add(source)
 
-        self.stdout.write(self.style.SUCCESS('Added ' + str(i+1) + ' translation pairs to the database'))
+                source_collocation_id = collocation_id
+
+                targetfreq = targetmodel[targetpattern]
+                if targetpattern in targetcollocations:
+                    collocation_id = targetcollocations[targetpattern]
+                else:
+                    collocation_id += 1
+                    targetcollocations.add(targetpattern, collocation_id)
+                    f.write("INSERT INTO `web_collocation` (`id`,`collection`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + sqlescape(targetpattern.tostring(targetclassdecoder)) + "\"," + str(targetfreq) + ") ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+
+                #target,created = Collocation.objects.get_or_create(collection=collection, language=options['targetlang'], text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
+                #n_target += int(created)
+                for wordpattern in targetpattern.ngrams(1):
+                    text = wordpattern.tostring(targetclassdecoder)
+                    if wordpattern not in targetkeywords:
+                        keywords_id += 1
+                        targetkeywords.add(wordpattern, keywords_id)
+                    f.write("INSERT INTO `web_keyword` (`id`,`collection`,`language`,`text`) VALUES ("+str(targetkeywords[wordpattern])+","+str(collection.id)+",\"" + options['targetlang'] + ",\"" + sqlescape(text) + "\");\n")
+                    keyword_collocations_id += 1
+                    f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(targetkeywords[wordpattern])+"," + str(collocation_id) + ");\n")
+
+                    #keyword,created = Keyword.objects.get_or_create(text=wordpattern.tostring(targetclassdecoder), language=options['targetlang'], collection=collection)
+                    #n_target_keywords += int(created)
+                    #keyword.collocations.add(target)
+
+                translation_id += 1
+                f.write("INSERT INTO `web_translation` (`id`,`source_id`,`target_id`) VALUES ("+str(translation_id)+","+str(source_collocation_id)+"," + str(collocation_id) + ");\n")
+
+
+                #Translation.objects.create(source=source,target=target, prob=scores[0],  reverseprob=scores[2])
+
+            self.stdout.write(self.style.SUCCESS('Generated ' + str(i+1) + ' translation pairs for import into database'))
 
 
 
