@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'colloquery.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-if hostname[:9] == "applejack":
+if hostname[:9] == "applejack": #production environment in Nijmegen
     DATABASES = {
       'default': {
 	'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -91,13 +91,20 @@ if hostname[:9] == "applejack":
 	'PORT': '',                      # Set to empty string for default.
       }
     }
-else:
+elif hostname[:5] == "mhysa" or hostname[:7] == 'caprica': #my local development workstations
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+      'default': {
+	'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+	'NAME': 'colloquery',                      # Or path to database file if using sqlite3.
+	'USER': 'colloquery',
+	'PASSWORD': 'colloquery',
+	'HOST': '192.168.0.1',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
+	'PORT': '',                      # Set to empty string for default.
+      }
     }
+else:
+    raise Exception("I don't know where I'm running from!")
+
 
 
 # Password validation

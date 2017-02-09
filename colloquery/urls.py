@@ -16,10 +16,10 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from colloquery.web.views import index
+from colloquery.web.views import index, search
 
 urlpatterns = [
-    url(r'^/', index, name='index'),
+    url(r'^', index, name='index'),
     url(r'^search/?', search, name='search'),
     url(r'^admin/', admin.site.urls),
 ]
