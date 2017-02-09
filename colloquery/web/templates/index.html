@@ -2,9 +2,12 @@
 
 {% block contents %}
 <div id="searchform">
+ <form action="search/" method="get">
  <ul>
   {{ searchform.as_ul }}
  </ul>
+ <input type="submit" name="Submit" />
+ </form>
 </div>
 
 {% block results %}

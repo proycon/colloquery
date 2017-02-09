@@ -20,5 +20,6 @@ from colloquery.web.views import index
 
 urlpatterns = [
     url(r'^/', index, name='index'),
+    url(r'^search/?', search, name='search'),
     url(r'^admin/', admin.site.urls),
 ]
