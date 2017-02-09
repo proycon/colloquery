@@ -22,6 +22,6 @@ except ProgrammingError:
 
 
 class SearchForm(forms.Form):
-    text = forms.CharField(label="Search terms", max_length=150)
     collection = forms.ChoiceField(label="Collection", choices=collectionchoices )
-    keywordsearch = forms.BooleanField(label="Search by keywords")
+    text = forms.CharField(label="Search terms", max_length=150)
+    keywordsearch = forms.BooleanField(label="Search by keywords",required=False)

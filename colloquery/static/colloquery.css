@@ -75,3 +75,7 @@ input[type="submit"] {
     padding: 5px;
     font-size: 120%;
 }
+ul.errorlist {
+    font-size: 80%;
+    color: #bf1a1a;
+}

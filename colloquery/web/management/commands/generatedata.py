@@ -167,7 +167,7 @@ class Command(BaseCommand):
                     #keyword.collocations.add(target)
 
                 translation_id += 1
-                f.write("INSERT INTO `web_translation` (`id`,`source_id`,`target_id`) VALUES ("+str(translation_id)+","+str(source_collocation_id)+"," + str(target_collocation_id) + ");\n")
+                f.write("INSERT INTO `web_translation` (`id`,`source_id`,`target_id`,`prob`,`reverseprob`) VALUES ("+str(translation_id)+","+str(source_collocation_id)+"," + str(target_collocation_id) + "," + str(scores[0]) + "," + str(scores[2])  + ");\n")
 
 
                 #Translation.objects.create(source=source,target=target, prob=scores[0],  reverseprob=scores[2])
