@@ -36,3 +36,42 @@ body {
 h1,h2,h3,a {
     color: #681a1a
 }
+
+#searchform ul {
+    list-style-type: none;
+    margin: 0px;
+    margin-top: 25px;
+    padding: 0px;
+}
+#searchform ul li {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 5px;
+}
+label[for="id_text"] {
+    display: none;
+}
+#id_text {
+    margin-left: auto;
+    margin-right: auto;
+    width: 45%;
+}
+
+label {
+    display: inline-block;
+    font-variant: small-caps;
+    font-size: 90%;
+    font-weight: bold;
+}
+input[type="text"] {
+    font-size: 120%;
+    border-radius: 20px;
+    padding: 5px;
+}
+input[type="submit"] {
+    background: #681a1a;
+    color: white;
+    border-radius: 20px;
+    padding: 5px;
+    font-size: 120%;
+}
