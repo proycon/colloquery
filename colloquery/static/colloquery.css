@@ -6,6 +6,33 @@ body {
     background: #c5c0c0;
 }
 
+#header {
+    margin-left: auto;
+    margin-right: auto;
+    background: url(logo.png);
+    background-size: 612px 200px;
+    background-repeat: no-repeat;
+    width: 612px;
+    height: 200px;
+    min-width: 612px;
+    min-height: 200px;
+    text-align: center;
+}
+
+#contents {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+}
+
+#footer {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
 h1,h2,h3,a {
     color: #681a1a
 }
