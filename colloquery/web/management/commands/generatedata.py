@@ -33,51 +33,76 @@ class Command(BaseCommand):
         parser.add_argument('--maxlength', type=int,help="Maximum collocation size", action='store',default=8)
         parser.add_argument('--tmpdir', type=str,help="Temporary directory", action='store',default=os.environ['TMPDIR'] if 'TMPDIR' in os.environ else "/tmp")
         parser.add_argument('--out', type=str,help="Output to the following sql file", action='store',default="out.sql")
+        parser.add_argument('--force',help="Overwrite existing files", action='store_true')
+        #args.storeconst, args.dataset, args.num, args.bar
 
     def handle(self, *args, **options):
-        self.stdout.write("Encoding source corpus ...")
         sourceclassfile = os.path.join(options['tmpdir'], os.path.basename(options['sourcecorpus']).replace('.txt','') + '.colibri.cls')
         sourcecorpusfile = os.path.join(options['tmpdir'], os.path.basename(options['sourcecorpus']).replace('.txt','') + '.colibri.dat')
         sourcemodelfile = os.path.join(options['tmpdir'], os.path.basename(options['sourcecorpus']).replace('.txt','') + '.colibri.patternmodel')
-        sourceclassencoder = colibricore.ClassEncoder()
-        sourceclassencoder.build(options['sourcecorpus'])
-        sourceclassencoder.save(sourceclassfile)
-        sourceclassencoder.encodefile(options['sourcecorpus'], sourcecorpusfile)
-        self.stdout.write(self.style.SUCCESS('DONE'))
 
-        self.stdout.write("Encoding target corpus ...")
+        if not os.path.exists(sourceclassfile) or not os.path.exists(sourcecorpusfile) or options['force']:
+            self.stdout.write("Encoding source corpus ...")
+            sourceclassencoder = colibricore.ClassEncoder()
+            sourceclassencoder.build(options['sourcecorpus'])
+            sourceclassencoder.save(sourceclassfile)
+            sourceclassencoder.encodefile(options['sourcecorpus'], sourcecorpusfile)
+            self.stdout.write(self.style.SUCCESS('DONE'))
+        else:
+            self.stdout.write("Reusing previously encoded source corpus ...")
+
         targetclassfile = os.path.join(options['tmpdir'], os.path.basename(options['targetcorpus']).replace('.txt','') + '.colibri.cls')
         targetcorpusfile = os.path.join(options['tmpdir'], os.path.basename(options['targetcorpus']).replace('.txt','') + '.colibri.dat')
         targetmodelfile = os.path.join(options['tmpdir'], os.path.basename(options['targetcorpus']).replace('.txt','') + '.colibri.patternmodel')
-        targetclassencoder = colibricore.ClassEncoder()
-        targetclassencoder.build(options['targetcorpus'])
-        targetclassencoder.save(targetclassfile)
-        targetclassencoder.encodefile(options['targetcorpus'], targetcorpusfile)
-        self.stdout.write(self.style.SUCCESS('DONE'))
 
-        self.stdout.write('Computing pattern model of source corpus ...')
-        modeloptions = colibricore.PatternModelOptions(mintokens=options['freqthreshold'],maxlength=options['maxlength'])
-        sourcemodel = colibricore.UnindexedPatternModel()
-        sourcemodel.train(sourcecorpusfile, modeloptions)
-        sourcemodel.write(sourcemodelfile)
-        self.stdout.write(self.style.SUCCESS('DONE'))
+        if not os.path.exists(targetclassfile) or not os.path.exists(targetcorpusfile) or options['force']:
+            self.stdout.write("Encoding target corpus ...")
+            targetclassencoder = colibricore.ClassEncoder()
+            targetclassencoder.build(options['targetcorpus'])
+            targetclassencoder.save(targetclassfile)
+            targetclassencoder.encodefile(options['targetcorpus'], targetcorpusfile)
+            self.stdout.write(self.style.SUCCESS('DONE'))
+        else:
+            self.stdout.write("Reusing previously encoded target corpus ...")
 
-        self.stdout.write('Computing pattern model of target corpus ...')
-        targetmodel = colibricore.UnindexedPatternModel()
-        targetmodel.train(targetcorpusfile, modeloptions)
-        targetmodel.write(targetmodelfile)
-        self.stdout.write(self.style.SUCCESS('DONE'))
+        if not os.path.exists(sourcemodelfile) or options['force']:
+            self.stdout.write('Computing pattern model of source corpus ...')
+            modeloptions = colibricore.PatternModelOptions(mintokens=options['freqthreshold'],maxlength=options['maxlength'])
+            sourcemodel = colibricore.UnindexedPatternModel()
+            sourcemodel.train(sourcecorpusfile, modeloptions)
+            sourcemodel.write(sourcemodelfile)
+            self.stdout.write(self.style.SUCCESS('DONE'))
+        else:
+            sourcemodel = None
+            self.stdout.write("Reusing previously computed source model ...")
+
+        if not os.path.exists(targetmodelfile) or options['force']:
+            self.stdout.write('Computing pattern model of target corpus ...')
+            targetmodel = colibricore.UnindexedPatternModel()
+            targetmodel.train(targetcorpusfile, modeloptions)
+            targetmodel.write(targetmodelfile)
+            self.stdout.write(self.style.SUCCESS('DONE'))
+        else:
+            targetmodel = None
+            self.stdout.write("Reusing previously computed target model ...")
 
         alignmodelfile = os.path.join(options['tmpdir'], "alignmodel.colibri")
 
         #delete models to conserve memory during next step
-        del sourcemodel
-        del targetmodel
-        self.stdout.write(self.style.SUCCESS('Unloaded patternmodels'))
+        if sourcemodel is not None:
+            del sourcemodel
+            self.stdout.write(self.style.SUCCESS('Unloaded source patternmodel'))
+        if targetmodel is not None:
+            del targetmodel
+            self.stdout.write(self.style.SUCCESS('Unloaded target patternmodel'))
 
-        self.stdout.write("Computing alignment model")
-        os.system("colibri-mosesphrasetable2alignmodel -i " + options['phrasetable'] + " -o " + alignmodelfile + " -S " + sourceclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(options['freqthreshold']) + " -l " + str(options['maxlength']) + " -p " + str(options['pts']) + " -P " + str(options['pst']) + " -j " + str(options['joinedthreshold']) + " -d " + str(options['divergencethreshold']))
-        self.stdout.write(self.style.SUCCESS('DONE'))
+        if not os.path.exists(alignmodelfile) or options['force']:
+            self.stdout.write("Computing alignment model")
+            os.system("colibri-mosesphrasetable2alignmodel -i " + options['phrasetable'] + " -o " + alignmodelfile + " -S " + sourceclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(options['freqthreshold']) + " -l " + str(options['maxlength']) + " -p " + str(options['pts']) + " -P " + str(options['pst']) + " -j " + str(options['joinedthreshold']) + " -d " + str(options['divergencethreshold']))
+            self.stdout.write(self.style.SUCCESS('DONE'))
+        else:
+            self.stdout.write(self.style.SUCCESS('Reusing previously computed alignment model'))
+
 
         self.stdout.write("Loading models")
         sourceclassdecoder = colibricore.ClassDecoder(sourceclassfile)
