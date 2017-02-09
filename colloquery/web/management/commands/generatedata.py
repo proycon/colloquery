@@ -65,9 +65,10 @@ class Command(BaseCommand):
         else:
             self.stdout.write("Reusing previously encoded target corpus ...")
 
+        modeloptions = colibricore.PatternModelOptions(mintokens=options['freqthreshold'],maxlength=options['maxlength'])
+
         if not os.path.exists(sourcemodelfile) or options['force']:
             self.stdout.write('Computing pattern model of source corpus ...')
-            modeloptions = colibricore.PatternModelOptions(mintokens=options['freqthreshold'],maxlength=options['maxlength'])
             sourcemodel = colibricore.UnindexedPatternModel()
             sourcemodel.train(sourcecorpusfile, modeloptions)
             sourcemodel.write(sourcemodelfile)
