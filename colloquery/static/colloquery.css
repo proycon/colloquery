@@ -1,0 +1,11 @@
+/* Colloquery stylesheet */
+
+body {
+    font-family: sans;
+    font-size: 12px;
+    background: #c5c0c0;
+}
+
+h1,h2,h3,a {
+    color: #681a1a
+}
