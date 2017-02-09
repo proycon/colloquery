@@ -97,8 +97,9 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS('Unloaded target patternmodel'))
 
         if not os.path.exists(alignmodelfile) or options['force']:
-            self.stdout.write("Computing alignment model")
-            os.system("colibri-mosesphrasetable2alignmodel -i " + options['phrasetable'] + " -o " + alignmodelfile + " -S " + sourceclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(options['freqthreshold']) + " -l " + str(options['maxlength']) + " -p " + str(options['pts']) + " -P " + str(options['pst']) + " -j " + str(options['joinedthreshold']) + " -d " + str(options['divergencethreshold']))
+            cmd = "colibri-mosesphrasetable2alignmodel -i " + options['phrasetable'] + " -o " + alignmodelfile + " -S " + sourceclassfile + " -T " + targetclassfile + " -m " + sourcemodelfile + " -M " + targetmodelfile + " -t " + str(options['freqthreshold']) + " -l " + str(options['maxlength']) + " -p " + str(options['pts']) + " -P " + str(options['pst']) + " -j " + str(options['joinedthreshold']) + " -d " + str(options['divergencethreshold'])
+            self.stdout.write("Computing alignment model: " + cmd)
+            os.system(cmd)
             self.stdout.write(self.style.SUCCESS('DONE'))
         else:
             self.stdout.write(self.style.SUCCESS('Reusing previously computed alignment model'))
