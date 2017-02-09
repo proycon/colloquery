@@ -10,12 +10,10 @@ body {
     margin-left: auto;
     margin-right: auto;
     background: url(logo.png);
-    background-size: 612px 200px;
+    background-size: 320px;
     background-repeat: no-repeat;
-    width: 612px;
-    height: 200px;
-    min-width: 612px;
-    min-height: 200px;
+    width: 320px;
+    height: 80px;
     text-align: center;
 }
 
@@ -27,6 +25,8 @@ body {
 }
 
 #footer {
+    margin-top: 100px;
+    font-size: 80%;
     width: 75%;
     margin-left: auto;
     margin-right: auto;
