@@ -40,4 +40,3 @@ class Translation(models.Model):
     source = models.ForeignKey(Collocation, on_delete=models.CASCADE, related_name="rev_source")
     target = models.ForeignKey(Collocation, on_delete=models.CASCADE, related_name="rev_target")
     prob = models.FloatField() #p(target|source)
-    reverseprob = models.FloatField() #p(source|target)
