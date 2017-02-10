@@ -15,6 +15,9 @@ from colloquery.web.models import Collection, Collocation, Keyword, Translation
 def sqlescape(s):
     return s.replace('"','\\"')
 
+def ignorable(s):
+    return '.' in s or ',' in s or '!' in s or '"' in s
+
 class Command(BaseCommand):
     help = "Compute and load collocation data into the database"
 
@@ -149,9 +152,12 @@ class Command(BaseCommand):
                     self.stdout.write("Generated " + str(i+1) + " pairs") #(source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
 
                 if prevsourcepattern is None or sourcepattern != prevsourcepattern:
-                    collocation_id += 1
                     sourcefreq = sourcemodel[sourcepattern]
-                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+", @collection_id ,\"" + options['sourcelang'] + "\",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                    text = sourcepattern.tostring(sourceclassdecoder)
+                    if ignorable(text):
+                        continue
+                    collocation_id += 1
+                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+", @collection_id ,\"" + options['sourcelang'] + "\",\"" + sqlescape(text) + "\"," + str(sourcefreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
                     #source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
 
                     #n_source += int(created)
@@ -175,10 +181,13 @@ class Command(BaseCommand):
                 if targetpattern in targetcollocations:
                     target_collocation_id = targetcollocations[targetpattern]
                 else:
+                    text = targetpattern.tostring(targetclassdecoder)
+                    if ignorable(text):
+                        continue
                     collocation_id += 1
                     target_collocation_id = collocation_id
                     targetcollocations.add(targetpattern, collocation_id)
-                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(target_collocation_id)+",@collection_id,\"" + options['targetlang'] + "\",\"" + sqlescape(targetpattern.tostring(targetclassdecoder)) + "\"," + str(targetfreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(target_collocation_id)+",@collection_id,\"" + options['targetlang'] + "\",\"" + sqlescape(text) + "\"," + str(targetfreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
 
                 #target,created = Collocation.objects.get_or_create(collection=collection, language=options['targetlang'], text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
                 #n_target += int(created)
