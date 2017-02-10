@@ -114,8 +114,8 @@ class Command(BaseCommand):
         alignmodel = colibricore.PatternAlignmentModel_float(alignmodelfile, modeloptions)
         self.stdout.write(self.style.SUCCESS('DONE'))
 
-        collection,_ = Collection.objects.get_or_create(name=options['title'], sourcelanguage=options['sourcelang'], targetlanguage=options['targetlang'])
-        self.stdout.write(self.style.SUCCESS('Created collection'))
+        #collection,_ = Collection.objects.get_or_create(name=options['title'], sourcelanguage=options['sourcelang'], targetlanguage=options['targetlang'])
+
 
 
         self.stdout.write("Generating translation pairs (this may take a while)..." )
@@ -142,6 +142,8 @@ class Command(BaseCommand):
         prevsourcepattern = None
         with open(options['out'], 'w', encoding='utf-8') as f:
             f.write("SET NAMES utf8;\n")
+            f.write("INSERT INTO `web_collection` (`name`,`sourcelanguage`,`targetlanguage`) VALUES (\""+options['title']+"\",\"" + options['sourcelang'] + "\",\"" + options['targetlang'] + "\");\n")
+            f.write("SET @collection_id = LAST_INSERT_ID();")
             for i, (sourcepattern, targetpattern, scores) in enumerate(alignmodel.triples()):
                 if i % 10000 == 0:
                     self.stdout.write("Generated " + str(i+1) + " pairs") #(source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
@@ -149,7 +151,7 @@ class Command(BaseCommand):
                 if prevsourcepattern is None or sourcepattern != prevsourcepattern:
                     collocation_id += 1
                     sourcefreq = sourcemodel[sourcepattern]
-                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(collocation_id)+", @collection_id ,\"" + options['sourcelang'] + "\",\"" + sqlescape(sourcepattern.tostring(sourceclassdecoder)) + "\"," + str(sourcefreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
                     #source,created  = Collocation.objects.get_or_create(collection=collection, language=options['sourcelang'], text=sourcepattern.tostring(sourceclassdecoder), freq=sourcefreq)
 
                     #n_source += int(created)
@@ -158,7 +160,7 @@ class Command(BaseCommand):
                         if wordpattern not in sourcekeywords:
                             keywords_id += 1
                             sourcekeywords.add(wordpattern, keywords_id)
-                            f.write("INSERT INTO `web_keyword` (`id`,`collection_id`,`language`,`text`) VALUES ("+str(sourcekeywords[wordpattern])+","+str(collection.id)+",\"" + options['sourcelang'] + "\",\"" + sqlescape(text) + "\");\n")
+                            f.write("INSERT INTO `web_keyword` (`id`,`collection_id`,`language`,`text`) VALUES ("+str(sourcekeywords[wordpattern])+", @collection_id ,\"" + options['sourcelang'] + "\",\"" + sqlescape(text) + "\");\n")
                         keyword_collocations_id += 1
                         f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(sourcekeywords[wordpattern])+"," + str(collocation_id) + ") ON DUPLICATE KEY UPDATE `collocation_id`=`collocation_id`;\n")
                         #keyword,created = Keyword.objects.get_or_create(text=text, language=options['sourcelang'], collection=collection)
@@ -176,7 +178,7 @@ class Command(BaseCommand):
                     collocation_id += 1
                     target_collocation_id = collocation_id
                     targetcollocations.add(targetpattern, collocation_id)
-                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(target_collocation_id)+","+str(collection.id)+",\"" + options['targetlang'] + "\",\"" + sqlescape(targetpattern.tostring(targetclassdecoder)) + "\"," + str(targetfreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
+                    f.write("INSERT INTO `web_collocation` (`id`,`collection_id`,`language`,`text`,`freq`) VALUES ("+str(target_collocation_id)+",@collection_id,\"" + options['targetlang'] + "\",\"" + sqlescape(targetpattern.tostring(targetclassdecoder)) + "\"," + str(targetfreq) + ");\n") #ON DUPLICATE KEY UPDATE `freq`=`freq`;\n")
 
                 #target,created = Collocation.objects.get_or_create(collection=collection, language=options['targetlang'], text=targetpattern.tostring(targetclassdecoder), freq=targetfreq)
                 #n_target += int(created)
@@ -185,7 +187,7 @@ class Command(BaseCommand):
                     if wordpattern not in targetkeywords:
                         keywords_id += 1
                         targetkeywords.add(wordpattern, keywords_id)
-                        f.write("INSERT INTO `web_keyword` (`id`,`collection_id`,`language`,`text`) VALUES ("+str(targetkeywords[wordpattern])+","+str(collection.id)+",\"" + options['targetlang'] + "\",\"" + sqlescape(text) + "\");\n")
+                        f.write("INSERT INTO `web_keyword` (`id`,`collection_id`,`language`,`text`) VALUES ("+str(targetkeywords[wordpattern])+",@collection_id,\"" + options['targetlang'] + "\",\"" + sqlescape(text) + "\");\n")
                     keyword_collocations_id += 1
                     f.write("INSERT INTO `web_keyword_collocations` (`id`,`keyword_id`,`collocation_id`) VALUES ("+str(keyword_collocations_id)+","+str(targetkeywords[wordpattern])+"," + str(target_collocation_id) + ") ON DUPLICATE KEY UPDATE `collocation_id`=`collocation_id`;\n")
 
