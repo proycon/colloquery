@@ -129,7 +129,7 @@ class Command(BaseCommand):
 
         mongoengine.connect("colloquery", alias="default")
 
-        targetcollocations = colibricore.PatternSet()  #maps collocation text to primary key
+        targetcollocations = {}
         prevsourcepattern = None
         collection = Collection(name=options['title'], sourcelanguage=options['sourcelang'], targetlanguage=options['targetlang'])
         collection.save()
@@ -156,11 +156,13 @@ class Command(BaseCommand):
             if ignorable(text):
                 continue
             if targetpattern in targetcollocations: #quicker in-memory lookup
-                targetcollocation = Collocation.objects(text=text, language=options['targetlang'], collection=collection)[0] #get from db
+                # targetcollocation = Collocation.objects(text=text, language=options['targetlang'], collection=collection)[0] #get from db
+                targetcollocation = targetcollocations[targetpattern]
             else:
                 targetcollocation = Collocation(collection=collection, language=options['targetlang'], text=text, freq=targetfreq)
                 targetcollocation.save()
-                targetcollocations.add(targetpattern)
+                #self.stdout.write(repr(targetcollocation.id))
+                targetcollocations[targetpattern] = targetcollocation.id
 
             Translation(source=sourcecollocation, target=targetcollocation, prob=scores[0]).save()
             Translation(source=targetcollocation, target=sourcecollocation, prob=scores[2]).save()
