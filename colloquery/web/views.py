@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from colloquery.web.models import Collection, Collocation, Keyword,  Translation
+from colloquery.web.models import Collection, Collocation, Translation
 from colloquery.web.forms import SearchForm
 
 
