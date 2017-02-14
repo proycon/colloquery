@@ -10,6 +10,7 @@ import colibricore
 import mongoengine
 from django.core.management.base import BaseCommand, CommandError
 from django.core.exceptions import ObjectDoesNotExist
+from django.conf import settings
 from colloquery.web.models import Collection, Collocation, Translation
 
 
@@ -127,7 +128,7 @@ class Command(BaseCommand):
 
         self.stdout.write("Generating translation pairs (this may take a while)..." )
 
-        mongoengine.connect("colloquery", alias="default")
+        mongoengine.connect("colloquery", host=settings.MONGODB_HOST, port=settings.MONGODB_PORT, alias="default")
 
         targetcollocations = {}
         prevsourcepattern = None

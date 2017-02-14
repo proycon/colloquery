@@ -91,6 +91,8 @@ if hostname[:9] == "applejack": #production environment in Nijmegen
 	'PORT': '',                      # Set to empty string for default.
       }
     }
+    MONGODB_HOST = 'localhost'
+    MONGODB_PORT = 27011
 elif hostname[:5] == "mhysa" or hostname[:7] == 'caprica': #my local development workstations
     DATABASES = {
       'default': {
@@ -102,6 +104,8 @@ elif hostname[:5] == "mhysa" or hostname[:7] == 'caprica': #my local development
 	'PORT': '',                      # Set to empty string for default.
       }
     }
+    MONGODB_HOST = 'localhost'
+    MONGODB_PORT = 27017
 else:
     raise Exception("I don't know where I'm running from!")
 
