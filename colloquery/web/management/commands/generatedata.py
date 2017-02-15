@@ -126,9 +126,11 @@ class Command(BaseCommand):
 
         l = len(alignmodel)
 
-        self.stdout.write("Generating translation pairs (this may take a while)..." )
 
+        self.stdout.write("Connecting to MongoDB server at " + settings.MONGODB_HOST + ":" + str(settings.MONGODB_PORT) )
         mongoengine.connect("colloquery", host=settings.MONGODB_HOST, port=settings.MONGODB_PORT, alias="default")
+
+        self.stdout.write("Generating translation pairs (this may take a while)..." )
 
         targetcollocations = {}
         prevsourcepattern = None
