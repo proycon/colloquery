@@ -11,7 +11,7 @@ MAXSOURCES=250
 
 
 TARGETSORTFUNCTION = {
-    'text': lambda x: x.text,
+    'text': lambda x: x.target.text,
     'freq': lambda x: -1 * x.target.freq,
     'prob': lambda x: -1 * x.prob,
     'revprob': lambda x: -1 * x.revprob,
