@@ -79,3 +79,24 @@ ul.errorlist {
     font-size: 80%;
     color: #bf1a1a;
 }
+
+table#results {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+#results thead th {
+    background: #723636;
+    color: white;
+    padding: 5px;
+    text-align: center;
+}
+#results thead th.source {
+    border-top-left-radius: 15px;
+}
+#results thead th.revprob {
+    border-top-right-radius: 15px;
+}
+#results tbody {
+    background: #e5d7d7;
+}
