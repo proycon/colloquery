@@ -25,7 +25,7 @@ def search(request):
     if searchform.is_valid():
         mode = searchform.cleaned_data['collection'][0]
         bykeyword = searchform.cleaned_data['bykeyword']
-        collection = Collection.objects.get(id=int(searchform.cleaned_data['collection'][1:]))
+        collection = Collection.objects.get(id=searchform.cleaned_data['collection'][1:])
 
         #set language
         if mode == Mode.FORWARD:
@@ -41,16 +41,17 @@ def search(request):
 
         if bykeyword:
             #search by keyword
-            pass #TODO
+            sources = Collocation.objects(collection=collection, language=sourcelanguage).text_search(searchform.cleaned_data['text'].lower()).order_by('text')[:10]
         else:
             #exact search
-            #results = Collocation.objects.filter(collection=collection,language=sourcelanguage,text=searchform.cleaned_data['text'].lower()).prefetch_related(Prefetch('translations',queryset=Translation.objects.order_by('prob')))
-            pass
+            sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).order_by('text')[:10]
+
+        translations = Translation.objects(source__in=sources).select_related()
 
         return render(request, "search.html", {
             'searchform': searchform,
             'version': settings.VERSION,
-            'results': results,
+            'translations': translations,
         })
     else:
         return render(request, "index.html", {

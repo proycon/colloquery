@@ -5,9 +5,9 @@ from colloquery.web.models import Collection
 
 
 LANGUAGENAMES = {
-    'eng': 'English',
-    'nld': 'Dutch',
-    'spa': 'Spanish',
+    'en': 'English',
+    'nl': 'Dutch',
+    'es': 'Spanish',
 }
 
 collectionchoices = []
