@@ -1,0 +1,28 @@
+{% extends "index.html" %}
+
+{% block results %}
+<table id="results">
+<thead>
+  <tr>
+    <th class="source">Source</th>
+    <th class="freq" title="Source frequency">Freq</th>
+    <th class="target">Target</th>
+    <th class="freq" title="Target frequency">Freq</th>
+    <th class="prob" title="p(target|source)">Translation prob.</th>
+    <th class="revprob" title="p(source|target)">Reverse prob.</th>
+  </tr>
+</thead>
+<tbody>
+{% for translation in translations %}
+  <tr>
+     <td class="source">{{ translation.source.text }}</td>
+     <td class="sfreq">{{ translation.source.freq }}</td>
+     <td class="target">{{ translation.target.text }}</td>
+     <td class="tfreq">{{ translation.target.freq }}</td>
+     <td class="prob">{{ translation.prob|floatformat:2 }}</td>
+     <td class="revprob">{{ translation.revprob|floatformat:2 }}</td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock results %}
