@@ -92,10 +92,44 @@ table#results {
     text-align: center;
 }
 #results thead th.source {
+    width: 25%;
     border-top-left-radius: 15px;
+}
+#results thead th.target {
+    width: 25%
+}
+#results td {
+    padding: 5px;
+}
+#results td.source {
+    background: #eeeeee;
+    font-size: 110%;
+}
+#results td.target {
+    background: #eeeeee;
+    color: #790303;
+    font-size: 110%;
+}
+#results thead th.freq {
+    width: 10%;
 }
 #results thead th.revprob {
     border-top-right-radius: 15px;
+}
+#results tbody td.sfreq {
+    text-align: right;
+    font-style: italic;
+    color: #1d126d;
+}    
+#results tbody td.tfreq {
+    text-align: right;
+    font-style: italic;
+    color: #790303;
+}    
+#results tbody td.prob, #results tbody td.revprob {
+    text-align: right;
+    font-style: italic;
+    color: black;
 }
 #results tbody {
     background: #e5d7d7;
