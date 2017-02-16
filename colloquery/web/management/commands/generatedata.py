@@ -128,7 +128,7 @@ class Command(BaseCommand):
 
 
         self.stdout.write("Connecting to MongoDB server at " + settings.MONGODB_HOST + ":" + str(settings.MONGODB_PORT) )
-        mongoengine.connect("colloquery", host=settings.MONGODB_HOST, port=settings.MONGODB_PORT, alias="default")
+        mongoengine.connect("colloquery", host=settings.MONGODB_HOST, port=settings.MONGODB_PORT)
 
         self.stdout.write("Generating translation pairs (this may take a while)..." )
 
@@ -167,5 +167,5 @@ class Command(BaseCommand):
                 #self.stdout.write(repr(targetcollocation.id))
                 targetcollocations[targetpattern] = targetcollocation.id
 
-            Translation(source=sourcecollocation, target=targetcollocation, prob=scores[0]).save()
-            Translation(source=targetcollocation, target=sourcecollocation, prob=scores[2]).save()
+            Translation(source=sourcecollocation, target=targetcollocation, prob=scores[0], revprob=scores[2]).save()
+            Translation(source=targetcollocation, target=sourcecollocation, prob=scores[2], revprob=scores[0]).save()

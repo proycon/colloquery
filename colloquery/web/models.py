@@ -31,6 +31,7 @@ class Translation(mongoengine.Document):
     source = mongoengine.ReferenceField(Collocation)
     target = mongoengine.ReferenceField(Collocation)
     prob = mongoengine.FloatField() #p(target|source)
+    revprob = mongoengine.FloatField() #p(source|target)
 
     meta = {
         'indexes': [
