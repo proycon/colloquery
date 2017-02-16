@@ -2,6 +2,8 @@ from django.shortcuts import render
 from django.conf import settings
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
+from collections import defaultdict
+
 from colloquery.web.models import Collection, Collocation, Translation
 from colloquery.web.forms import SearchForm
 
@@ -61,19 +63,17 @@ def search(request):
             #exact search
             sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).order_by(sourceorder)[:MAXSOURCES]
 
+        translationsbysource = defaultdict(list)
+        for translation in Translation.objects(source__in=sources).select_related():
+            translationsbysource[translation.source.id].append(translation)
 
         buffer = []
         translations = []
-        prevsource = None
-        for translation in Translation.objects(source__in=sources).select_related():
-            if translation.source.text == prevsource:
+        for source in sources:
+            buffer = sorted(translationsbysource[source.id], key=TARGETSORTFUNCTION[targetorder])
+            for translation in buffer[1:]:
                 translation.repeatedsource = True
-            elif buffer:
-                translations += sortbuffer(buffer, targetorder)
-                buffer = []
-            buffer.append(translation)
-            prevsource = translation.source.text
-        translations += sortbuffer(buffer, targetorder)
+            translations += buffer
 
         return render(request, "search.html", {
             'searchform': searchform,
