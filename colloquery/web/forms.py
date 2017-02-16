@@ -27,3 +27,5 @@ class SearchForm(forms.Form):
     collection = forms.ChoiceField(label="Collection", choices=collectionchoices )
     text = forms.CharField(label="Search terms", max_length=150)
     bykeyword = forms.BooleanField(label="Search by keywords",required=False)
+    sourceorder = forms.ChoiceField(label="Source order", choices=[('text','Text'), ('-freq', 'Frequency')],initial='text')
+    targetorder = forms.ChoiceField(label="Target order", choices=[('text','Text'), ('freq', 'Frequency'),('prob','Translation probability'), ('revprob', 'Reverse probability') ],initial='prob')

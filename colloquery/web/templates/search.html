@@ -15,7 +15,11 @@
 <tbody>
 {% for translation in translations %}
   <tr>
+     {% if translation.repeatedsource %}
+     <td class="samesource"></td>
+     {% else %}
      <td class="source">{{ translation.source.text }}</td>
+     {% endif %}
      <td class="sfreq">{{ translation.source.freq }}</td>
      <td class="target">{{ translation.target.text }}</td>
      <td class="tfreq">{{ translation.target.freq }}</td>

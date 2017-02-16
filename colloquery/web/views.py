@@ -5,6 +5,15 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from colloquery.web.models import Collection, Collocation, Translation
 from colloquery.web.forms import SearchForm
 
+MAXSOURCES=250
+
+
+TARGETSORTFUNCTION = {
+    'text': lambda x: x.text,
+    'freq': lambda x: -1 * x.target.freq,
+    'prob': lambda x: -1 * x.prob,
+    'revprob': lambda x: -1 * x.revprob,
+}
 
 class Mode:
     FORWARD = 'F'
@@ -19,13 +28,19 @@ def index(request):
         'version': settings.VERSION,
     })
 
+def sortbuffer(buffer, targetorder):
+    return sorted(buffer, key=TARGETSORTFUNCTION[targetorder] )
+
 def search(request):
     searchform = SearchForm(request.GET)
 
     if searchform.is_valid():
         mode = searchform.cleaned_data['collection'][0]
         bykeyword = searchform.cleaned_data['bykeyword']
+        sourceorder = searchform.cleaned_data['sourceorder']
+        targetorder = searchform.cleaned_data['targetorder']
         collection = Collection.objects.get(id=searchform.cleaned_data['collection'][1:])
+
 
         #set language
         if mode == Mode.FORWARD:
@@ -41,12 +56,24 @@ def search(request):
 
         if bykeyword:
             #search by keyword
-            sources = Collocation.objects(collection=collection, language=sourcelanguage).text_search(searchform.cleaned_data['text'].lower()).order_by('text')[:10]
+            sources = Collocation.objects(collection=collection, language=sourcelanguage).search_text(searchform.cleaned_data['text'].lower()).order_by(sourceorder)[:MAXSOURCES]
         else:
             #exact search
-            sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).order_by('text')[:10]
+            sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).order_by(sourceorder)[:MAXSOURCES]
 
-        translations = Translation.objects(source__in=sources).select_related()
+
+        buffer = []
+        translations = []
+        prevsource = None
+        for translation in Translation.objects(source__in=sources).select_related():
+            if translation.source.text == prevsource:
+                translation.repeatedsource = True
+            elif buffer:
+                translations += sortbuffer(buffer, targetorder)
+                buffer = []
+            buffer.append(translation)
+            prevsource = translation.source.text
+        translations += sortbuffer(buffer, targetorder)
 
         return render(request, "search.html", {
             'searchform': searchform,

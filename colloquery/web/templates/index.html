@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 
+{% block js %}
+document.addEventListener("DOMContentLoaded", function(event) {
+    var e = document.getElementById("id_text");
+    e.outerHTML += "<input type=\"submit\" value=\"Query\" /></li>";
+});
+{% endblock js %}
+
 {% block contents %}
 <div id="searchform">
  <form action="search/" method="get">
  <ul>
   {{ searchform.as_ul }}
-  <li><input type="submit" value="Query" /></li>
  </ul>
  </form>
 </div>
