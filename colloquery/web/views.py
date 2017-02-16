@@ -80,7 +80,7 @@ def search(request):
             translations += buffer
 
         prevlink = (skip > 0)
-        forwardlink = ((i-skip)>=MAXSOURCES)
+        forwardlink = ((i-skip)>=MAXSOURCES-1)
         noresults = (i==0)
 
         return render(request, "search.html", {
@@ -90,6 +90,7 @@ def search(request):
             'prevlink': prevlink,
             'forwardlink': forwardlink,
             'noresults': noresults,
+            'maxsources': MAXSOURCES,
         })
     else:
         return render(request, "index.html", {

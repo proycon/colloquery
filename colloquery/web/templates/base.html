@@ -10,14 +10,19 @@
         <link rel="StyleSheet" href="/static/colloquery.css" type="text/css" />
         <!--<script type="text/javascript" src="/style/colloquery.js"></script>-->
         <script type="text/javascript">
+            {% if maxsources %}
+            maxsources = {{ maxsources }};
+            {% else %}
+            maxsources = 250;
+            {% endif %}
             function prevpage() {
-                var e = document.getElementById("id_skip");
-                e.value = int(e.value) - 250;
+                var e = document.getElementsByName("skip")[0];
+                e.value = parseInt(e.value) - maxsources;
                 document.searchform.submit();
             };
             function nextpage() {
-                var e = document.getElementById("id_skip");
-                e.value = int(e.value) + 250;
+                var e = document.getElementsByName("skip")[0];
+                e.value = parseInt(e.value) + maxsources;
                 document.searchform.submit();
             };
             {% block js %}
