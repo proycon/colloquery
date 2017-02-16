@@ -9,10 +9,11 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
 {% block contents %}
 <div id="searchform">
- <form action="search/" method="get">
+ <form action="search/" method="get" name="searchform">
  <ul>
   {{ searchform.as_ul }}
  </ul>
+ <input type="hidden" name="skip" value="0" />
  </form>
 </div>
 

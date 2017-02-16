@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.conf import settings
+from django.http import HttpResponseForbidden
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from collections import defaultdict
@@ -41,6 +42,8 @@ def search(request):
         bykeyword = searchform.cleaned_data['bykeyword']
         sourceorder = searchform.cleaned_data['sourceorder']
         targetorder = searchform.cleaned_data['targetorder']
+        skip = searchform.cleaned_data['skip']
+
         collection = Collection.objects.get(id=searchform.cleaned_data['collection'][1:])
 
 
@@ -58,10 +61,10 @@ def search(request):
 
         if bykeyword:
             #search by keyword
-            sources = Collocation.objects(collection=collection, language=sourcelanguage).search_text(searchform.cleaned_data['text'].lower()).order_by(sourceorder)[:MAXSOURCES]
+            sources = Collocation.objects(collection=collection, language=sourcelanguage).search_text(searchform.cleaned_data['text'].lower()).order_by(sourceorder)[skip:skip+MAXSOURCES]
         else:
             #exact search
-            sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).order_by(sourceorder)[:MAXSOURCES]
+            sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).order_by(sourceorder)[skip:skip+MAXSOURCES]
 
         translationsbysource = defaultdict(list)
         for translation in Translation.objects(source__in=sources).select_related():
@@ -69,16 +72,24 @@ def search(request):
 
         buffer = []
         translations = []
-        for source in sources:
+        i = 0 #in case the loop doesn't run with no sources
+        for i, source in enumerate(sources):
             buffer = sorted(translationsbysource[source.id], key=TARGETSORTFUNCTION[targetorder])
             for translation in buffer[1:]:
                 translation.repeatedsource = True
             translations += buffer
 
+        prevlink = (skip > 0)
+        forwardlink = ((i-skip)>=MAXSOURCES)
+        noresults = (i==0)
+
         return render(request, "search.html", {
             'searchform': searchform,
             'version': settings.VERSION,
             'translations': translations,
+            'prevlink': prevlink,
+            'forwardlink': forwardlink,
+            'noresults': noresults,
         })
     else:
         return render(request, "index.html", {

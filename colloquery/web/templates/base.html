@@ -10,6 +10,16 @@
         <link rel="StyleSheet" href="/static/colloquery.css" type="text/css" />
         <!--<script type="text/javascript" src="/style/colloquery.js"></script>-->
         <script type="text/javascript">
+            function prevpage() {
+                var e = document.getElementById("id_skip");
+                e.value = int(e.value) - 250;
+                document.searchform.submit();
+            };
+            function nextpage() {
+                var e = document.getElementById("id_skip");
+                e.value = int(e.value) + 250;
+                document.searchform.submit();
+            };
             {% block js %}
             {% endblock js %}
         </script>

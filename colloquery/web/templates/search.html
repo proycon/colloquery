@@ -1,6 +1,16 @@
 {% extends "index.html" %}
 
 {% block results %}
+
+{% if noresults %}
+<div id="noresults">
+    {% if prevlink %}
+        Your query did not yield any further results ...
+    {% else %}
+        Your query did not yield any results ...
+    {% endif %}
+</div>
+{% else %}
 <table id="results">
 <thead>
   <tr>
@@ -29,4 +39,15 @@
 {% endfor %}
 </tbody>
 </table>
+{% endif %}
+
+<div id="paginator">
+{% if prevlink %}
+<button onclick="prevpage()">←</button>
+{% endif %}
+{% if nextlink %}
+<button onclick="nextpage()">→</button>
+{% endif %}
+</div>
+
 {% endblock results %}

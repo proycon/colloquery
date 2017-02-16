@@ -138,3 +138,13 @@ table#results {
 #results tbody {
     background: #e5d7d7;
 }
+#paginator {
+    text-align: center;
+}
+#noresults {
+    padding: 20px;
+    border: 1px dashed #723636;
+    color: #723636;
+    font-size: 110%;
+    text-align: center;
+}
