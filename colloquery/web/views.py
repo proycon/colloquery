@@ -66,6 +66,7 @@ def search(request):
             #exact search
             sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).order_by(sourceorder)[skip:skip+MAXSOURCES]
 
+        results = False
         if mode in (Mode.FORWARD, Mode.REVERSE):
             translationsbysource = defaultdict(list)
             for translation in Translation.objects(source__in=sources).select_related():
@@ -75,6 +76,7 @@ def search(request):
             translations = []
             i = 0 #in case the loop doesn't run with no sources
             for i, source in enumerate(sources):
+                results = True
                 buffer = sorted(translationsbysource[source.id], key=TARGETSORTFUNCTION[targetorder])
                 for translation in buffer[1:]:
                     translation.repeatedsource = True
@@ -87,7 +89,7 @@ def search(request):
 
         prevlink = (skip > 0)
         forwardlink = ((i-skip)>=MAXSOURCES-1)
-        noresults = (i==0)
+        noresults = (not results)
 
         return render(request, "search.html", {
             'searchform': searchform,
