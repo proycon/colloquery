@@ -66,12 +66,12 @@ def search(request):
             #exact search
             sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).order_by(sourceorder)[skip:skip+MAXSOURCES]
 
+        translationsbysource = defaultdict(list)
+        for translation in Translation.objects(source__in=sources).select_related():
+            translationsbysource[translation.source.id].append(translation)
+
         results = False
         if mode in (Mode.FORWARD, Mode.REVERSE):
-            translationsbysource = defaultdict(list)
-            for translation in Translation.objects(source__in=sources).select_related():
-                translationsbysource[translation.source.id].append(translation)
-
             buffer = []
             translations = []
             i = 0 #in case the loop doesn't run with no sources
