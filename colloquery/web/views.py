@@ -70,21 +70,30 @@ def search(request):
         for translation in Translation.objects(source__in=sources).select_related():
             translationsbysource[translation.source.id].append(translation)
 
+        translations = []
+
         results = False
+        i = 0 #in case the loop doesn't run with no sources
+
         if mode in (Mode.FORWARD, Mode.REVERSE):
             buffer = []
-            translations = []
-            i = 0 #in case the loop doesn't run with no sources
             for i, source in enumerate(sources):
                 results = True
                 buffer = sorted(translationsbysource[source.id], key=TARGETSORTFUNCTION[targetorder])
                 for translation in buffer[1:]:
                     translation.repeatedsource = True
                 translations += buffer
-        else:
-            #synonyms
-            pass
+        elif mode in (Mode.SOURCESYN, Mode.TARGETSYN):
+            translationsbytarget = defaultdict(set)
+            for translation in Translation.objects(source__in=[ t.target for sublist in translationsbysource.values() for t in sublist  ]).select_related():
+                translationsbytarget[translation.source.id].add(translation)
 
+            for i, source in enumerate(sources):
+                for translation in translationsbysource[source.id]:
+                    for revtranslation in translationsbytarget[translation.target.id]:
+                        if revtranslation.target.id != source.id:
+                            repeatedsource = translations and translations[-1].source.id == source.id
+                            translations.append({'source': source, 'target': revtranslation.target, 'sourcefreq': source.freq, 'targetfreq': revtranslation.target.freq,  'prob': translation.prob * revtranslation.prob, 'repeatedsource': repeatedsource})
 
 
         prevlink = (skip > 0)
