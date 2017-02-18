@@ -28,10 +28,10 @@
      {% if translation.repeatedsource %}
      <td class="samesource"></td>
      {% else %}
-     <td class="source">{{ translation.source.text }}</td>
+     <td class="source" onclick="sourceclick(this)">{{ translation.source.text }}</td>
      {% endif %}
      <td class="sfreq">{{ translation.source.freq }}</td>
-     <td class="target">{{ translation.target.text }}</td>
+     <td class="target" onclick="targetclick(this)">{{ translation.target.text }}</td>
      <td class="tfreq">{{ translation.target.freq }}</td>
      <td class="prob">{{ translation.prob|floatformat:2 }}</td>
      <td class="revprob">{{ translation.revprob|floatformat:2 }}</td>

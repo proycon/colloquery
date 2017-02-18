@@ -10,6 +10,12 @@
         <link rel="StyleSheet" href="/static/colloquery.css" type="text/css" />
         <!--<script type="text/javascript" src="/style/colloquery.js"></script>-->
         <script type="text/javascript">
+            {% if mode %}
+            mode = "{{ mode }}";
+            {% endif %}
+            {% if collection %}
+            collection = "{{ collection }}";
+            {% endif %}
             {% if maxsources %}
             maxsources = {{ maxsources }};
             {% else %}
@@ -25,6 +31,27 @@
                 e.value = parseInt(e.value) + maxsources;
                 document.searchform.submit();
             };
+            function sourceclick(e) {
+                document.getElementsByName("skip")[0].value = "0";
+                document.getElementById("id_text").value = e.innerHTML;
+                document.getElementById("id_bykeyword").checked = false;
+                document.searchform.submit();
+            }
+            function targetclick(e) {
+                document.getElementsByName("skip")[0].value = "0";
+                document.getElementById("id_text").value = e.innerHTML;
+                var collectionfield = document.getElementById("id_collection");
+                var index = collectionfield.options.selectedIndex;
+                var newmode = mode; //unchanged for synonyms
+                if (mode == 'F') {
+                    newmode = 'R';
+                } else if (mode == 'R') {
+                    newmode = 'F';
+                }
+                collectionfield.value = newmode + collection;
+                document.getElementById("id_bykeyword").checked = false;
+                document.searchform.submit();
+            }
             {% block js %}
             {% endblock js %}
         </script>

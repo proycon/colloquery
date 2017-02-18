@@ -111,6 +111,8 @@ def search(request):
             'forwardlink': forwardlink,
             'noresults': noresults,
             'maxsources': MAXSOURCES,
+            'collection': collection.id,
+            'mode': mode
         })
     else:
         return render(request, "index.html", {
