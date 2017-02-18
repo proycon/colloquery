@@ -139,10 +139,10 @@ table#results {
     background: #e5d7d7;
 }
 #results tr:hover {
-    background: #bbbbbb;
+    background: #d0b8b8;
 }
 #results tr:hover td.source, #results tr:hover td.target {
-    background: #dddddd;
+    background: #ffffff;
 }
 #paginator {
     text-align: center;
