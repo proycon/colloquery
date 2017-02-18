@@ -12,10 +12,10 @@ MAXSOURCES=250
 
 
 TARGETSORTFUNCTION = {
-    'text': lambda x: x.target.text,
-    'freq': lambda x: -1 * x.target.freq,
-    'prob': lambda x: -1 * x.prob,
-    'revprob': lambda x: -1 * x.revprob,
+    'text': lambda x: x['target'].text if isinstance(x, dict) else x.target.text,
+    'freq': lambda x: -1 * x['target'].freq if isinstance(x, dict) else -1 * x.target.freq,
+    'prob': lambda x: -1 * x['prob'] if isinstance(x, dict) else -1 * x.prob,
+    'revprob': lambda x: -1 * x['revprob'] if isinstance(x, dict) else -1 * x.revprob,
 }
 
 class Mode:
@@ -72,33 +72,36 @@ def search(request):
 
         translations = []
 
-        results = False
         i = 0 #in case the loop doesn't run with no sources
 
         if mode in (Mode.FORWARD, Mode.REVERSE):
             buffer = []
             for i, source in enumerate(sources):
-                results = True
                 buffer = sorted(translationsbysource[source.id], key=TARGETSORTFUNCTION[targetorder])
                 for translation in buffer[1:]:
                     translation.repeatedsource = True
                 translations += buffer
         elif mode in (Mode.SOURCESYN, Mode.TARGETSYN):
             translationsbytarget = defaultdict(set)
-            for translation in Translation.objects(source__in=[ t.target for sublist in translationsbysource.values() for t in sublist  ]).select_related():
-                translationsbytarget[translation.source.id].add(translation)
+            for revtranslation in Translation.objects(source__in=[ t.target for sublist in translationsbysource.values() for t in sublist  ]).select_related():
+                translationsbytarget[revtranslation.source.id].add(revtranslation)
+                #print("adding reverse translation: " + revtranslation.source.text + " -> " + revtranslation.target.text )
 
             for i, source in enumerate(sources):
+                buffer = []
                 for translation in translationsbysource[source.id]:
                     for revtranslation in translationsbytarget[translation.target.id]:
+                        #print("Considering synonym: " + revtranslation.target.text )
                         if revtranslation.target.id != source.id:
-                            repeatedsource = translations and translations[-1].source.id == source.id
-                            translations.append({'source': source, 'target': revtranslation.target, 'sourcefreq': source.freq, 'targetfreq': revtranslation.target.freq,  'prob': translation.prob * revtranslation.prob, 'repeatedsource': repeatedsource})
-
+                            #print("(target is source, skipping)")
+                            if revtranslation.target.id not in [ t.target.id for t in buffer ]:
+                                #buffer.append(Translation(source, target=revtranslation.target, sourcefreq= source.freq, targetfreq=revtranslation.target.freq,  prob=translation.prob * revtranslation.prob, repeatedsource= bool(buffer)))
+                                buffer.append({'source': source, 'target': revtranslation.target, 'sourcefreq': source.freq, 'targetfreq': revtranslation.target.freq,  'prob': translation.prob * revtranslation.prob, 'repeatedsource': bool(buffer) })
+                translations += sorted(buffer, key=TARGETSORTFUNCTION[targetorder])
 
         prevlink = (skip > 0)
         forwardlink = ((i-skip)>=MAXSOURCES-1)
-        noresults = (not results)
+        noresults = (not translations)
 
         return render(request, "search.html", {
             'searchform': searchform,
