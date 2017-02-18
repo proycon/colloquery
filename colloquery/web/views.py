@@ -94,7 +94,7 @@ def search(request):
                         #print("Considering synonym: " + revtranslation.target.text )
                         if revtranslation.target.id != source.id:
                             #print("(target is source, skipping)")
-                            if revtranslation.target.id not in [ t.target.id for t in buffer ]:
+                            if revtranslation.target.id not in [ t['target'].id for t in buffer ]:
                                 #buffer.append(Translation(source, target=revtranslation.target, sourcefreq= source.freq, targetfreq=revtranslation.target.freq,  prob=translation.prob * revtranslation.prob, repeatedsource= bool(buffer)))
                                 buffer.append({'source': source, 'target': revtranslation.target, 'sourcefreq': source.freq, 'targetfreq': revtranslation.target.freq,  'prob': translation.prob * revtranslation.prob, 'repeatedsource': bool(buffer) })
                 translations += sorted(buffer, key=TARGETSORTFUNCTION[targetorder])
