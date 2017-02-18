@@ -138,6 +138,12 @@ table#results {
 #results tbody {
     background: #e5d7d7;
 }
+#results tr:hover {
+    background: #bbbbbb;
+}
+#results tr:hover td.source, #results tr:hover td.target {
+    background: #dddddd;
+}
 #paginator {
     text-align: center;
 }
