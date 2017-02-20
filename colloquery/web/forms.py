@@ -1,7 +1,8 @@
 from django import forms
 from django.db.utils import ProgrammingError
-import mongoengine
+from django.conf import settings
 from colloquery.web.models import Collection
+import mongoengine
 
 
 LANGUAGENAMES = {
@@ -12,7 +13,7 @@ LANGUAGENAMES = {
 
 collectionchoices = []
 try:
-    mongoengine.connect("colloquery", alias="default")
+    mongoengine.connect("colloquery", host=settings.MONGODB_HOST, port=settings.MONGODB_PORT)
     for collection in Collection.objects():
         collectionchoices.append( ('F' + str(collection.id), collection.name + ": " + LANGUAGENAMES[collection.sourcelanguage] + " to " + LANGUAGENAMES[collection.targetlanguage]))
         collectionchoices.append( ('R' + str(collection.id), collection.name + ": " + LANGUAGENAMES[collection.targetlanguage] + " to " + LANGUAGENAMES[collection.sourcelanguage]))
