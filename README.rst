@@ -6,6 +6,10 @@ collocations, as well as synonyms,in bilingual phrase translation tables.
 
 It is developed for Van Dale, and licensed under the Affero GNU Public License.
 
+.. image:: https://raw.github.com/proycon/colloquery/master/screenshow.jpg
+    :alt: Colloquery screenshot
+    :align: center
+
 Installation
 --------------
 
@@ -34,7 +38,7 @@ To create phrase translation-tables in the first place, use Moses:
 Data Generation
 --------------------
 
-* Prepare your corpus files. The corpus consists of two plain-text UTF8 encoded
+* Prepare your parallel corpus files. A parallel corpus consists of two plain-text UTF8 encoded
   files, one for the source language (``corpus.fr`` in our example) and one for the target
   language (``corpus.en``).  Make sure they are tokenised, lower-cased and
   contain one sentence per line, sentences on the same line in the other file
