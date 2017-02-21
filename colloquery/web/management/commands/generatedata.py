@@ -143,6 +143,9 @@ class Command(BaseCommand):
                 self.stdout.write(str(round(((sourcecount + 1) / l) * 100,1)) + "% -- @" + str(sourcecount + 1) + " of " + str(l) + ": inserted " + str(i+1) + " pairs") #(source=" + str(n_source) + ", target=" + str(n_target) + ", source-keywords=" + str(n_source_keywords) + ", target-keywords=" + str(n_target_keywords) + ")")
 
             if prevsourcepattern is None or sourcepattern != prevsourcepattern:
+                prevsourcepattern = sourcepattern
+                sourcecount += 1
+
                 sourcefreq = sourcemodel[sourcepattern]
                 text = sourcepattern.tostring(sourceclassdecoder)
                 if ignorable(text):
@@ -150,8 +153,6 @@ class Command(BaseCommand):
                 sourcecollocation = Collocation(collection=collection, language=options['sourcelang'], text=text, freq=sourcefreq)
                 sourcecollocation.save()
 
-                prevsourcepattern = sourcepattern
-                sourcecount += 1
 
 
             targetfreq = targetmodel[targetpattern]
