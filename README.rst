@@ -4,7 +4,9 @@ Colloquery
 Colloquery is a web application to search for phrase translations, or
 collocations, as well as synonyms,in bilingual phrase translation tables. 
 
-It is developed for Van Dale, and licensed under the Affero GNU Public License.
+It is developed for `Van Dale <http://vandale.nl>`_ by the Centre of Language
+and Speech Technology, Radboud University Nijmegen, and is licensed under the
+Affero GNU Public License.
 
 .. image:: https://raw.github.com/proycon/colloquery/master/screenshot.jpg
     :alt: Colloquery screenshot
