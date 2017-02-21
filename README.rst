@@ -34,8 +34,11 @@ For the data generation step, the following additional dependencies are required
   `LaMachine <https://proycon.github.io/LaMachine>`_)
 * `colibri-mt <https://github.com/proycon/colibri-mt>`_
 
-To create phrase translation-tables in the first place, use Moses:
+To create phrase translation-tables in the first place, use the Moses training
+pipeline, which in turn invokes GIZA++:
+
 * `Moses <http://statmt.org/moses/>`_
+* `GIZA++ <https://github.com/moses-smt/giza-pp>`_
 
 Data Generation
 --------------------
