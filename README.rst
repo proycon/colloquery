@@ -6,7 +6,7 @@ collocations, as well as synonyms,in bilingual phrase translation tables.
 
 It is developed for Van Dale, and licensed under the Affero GNU Public License.
 
-.. image:: https://raw.github.com/proycon/colloquery/master/screenshow.jpg
+.. image:: https://raw.github.com/proycon/colloquery/master/screenshot.jpg
     :alt: Colloquery screenshot
     :align: center
 
@@ -19,21 +19,21 @@ Colloquery is not trivial to set-up and train, as it relies on numerous
 external dependencies:
 
 * Python 3 
-* `MongoDB <https://mongodb.com>_`
-* `mongoengine <http://mongoengine.org>_`
-* `Django <https://djangoproject.com>_`
+* `MongoDB <https://mongodb.com>`_
+* `mongoengine <http://mongoengine.org>`_
+* `Django <https://djangoproject.com>`_
 
 On Debian/Ubuntu systems, these can be installed using ``sudo apt-get install
 python3 mongodb python3-mongoengine python3-django``.
 
 For the data generation step, the following additional dependencies are required:
 
-* `colibri-core <https://github.com/proycon/colibri-core>_` (shipped as part of
-  `LaMachine <https://proycon.github.io/LaMachine>_`)
-* `colibri-mt <https://github.com/proycon/colibri-mt>_`
+* `colibri-core <https://github.com/proycon/colibri-core>`_ (shipped as part of
+  `LaMachine <https://proycon.github.io/LaMachine>`_)
+* `colibri-mt <https://github.com/proycon/colibri-mt>`_
 
 To create phrase translation-tables in the first place, use Moses:
-* `Moses <http://statmt.org/moses/>_`
+* `Moses <http://statmt.org/moses/>`_
 
 Data Generation
 --------------------
