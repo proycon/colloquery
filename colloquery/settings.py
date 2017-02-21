@@ -93,6 +93,7 @@ if hostname[:9] == "applejack": #production environment in Nijmegen
     }
     MONGODB_HOST = 'localhost'
     MONGODB_PORT = 27011
+    ALLOWED_HOSTS.append("colloquery.science.ru.nl")
 elif hostname[:5] == "mhysa" or hostname[:7] == 'caprica': #my local development workstations
     DATABASES = {
       'default': {
