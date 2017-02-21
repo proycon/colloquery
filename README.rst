@@ -46,7 +46,8 @@ Data Generation
 * Prepare your parallel corpus files. A parallel corpus consists of two plain-text UTF8 encoded
   files, one for the source language (``corpus.fr`` in our example) and one for the target
   language (``corpus.en``).  Make sure they are tokenised, lower-cased and
-  contain one sentence per line, sentences on the same line in the other file
+  contain one sentence per line (you can use `ucto
+  <https://languagemachines.github.io/ucto`_ for this), sentences on the same line in the other file
   are considering translations.
 * Train a phrase translation table using Moses::
 
