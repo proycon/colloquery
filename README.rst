@@ -30,7 +30,7 @@ python3 mongodb python3-mongoengine python3-django``.
 
 For the data generation step, the following additional dependencies are required:
 
-* `colibri-core <https://github.com/proycon/colibri-core>`_ (shipped as part of
+* `colibri-core <https://proycon.github.io/colibri-core>`_ (shipped as part of
   `LaMachine <https://proycon.github.io/LaMachine>`_)
 * `colibri-mt <https://github.com/proycon/colibri-mt>`_
 
