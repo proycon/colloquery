@@ -27,7 +27,7 @@ except ProgrammingError:
 class SearchForm(forms.Form):
     collection = forms.ChoiceField(label="Collection", choices=collectionchoices )
     text = forms.CharField(label="Search terms", max_length=150)
-    bykeyword = forms.BooleanField(label="Search by keyword",required=False)
+    bykeyword = forms.BooleanField(label="Search by keyword",initial=True,  required=False)
     sourceorder = forms.ChoiceField(label="Source order", choices=[('text','Text'), ('-freq', 'Frequency')],initial='-freq')
     targetorder = forms.ChoiceField(label="Target order", choices=[('text','Text'), ('freq', 'Frequency'),('prob','Translation probability'), ('revprob', 'Reverse probability') ],initial='prob')
     freqthreshold = forms.IntegerField(label="Frequency threshold", initial=1, min_value=1)
