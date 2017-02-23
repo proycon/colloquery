@@ -30,4 +30,6 @@ class SearchForm(forms.Form):
     bykeyword = forms.BooleanField(label="Search by keyword",required=False)
     sourceorder = forms.ChoiceField(label="Source order", choices=[('text','Text'), ('-freq', 'Frequency')],initial='-freq')
     targetorder = forms.ChoiceField(label="Target order", choices=[('text','Text'), ('freq', 'Frequency'),('prob','Translation probability'), ('revprob', 'Reverse probability') ],initial='prob')
+    freqthreshold = forms.IntegerField(label="Frequency threshold", initial=1, min_value=1)
+    probthreshold = forms.FloatField(label="Translation probability threshold", initial=0.2, min_value=0.0, max_value=1.0)
     skip = forms.IntegerField(widget=forms.HiddenInput(), initial=0)

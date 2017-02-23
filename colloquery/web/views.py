@@ -42,6 +42,8 @@ def search(request):
         bykeyword = searchform.cleaned_data['bykeyword']
         sourceorder = searchform.cleaned_data['sourceorder']
         targetorder = searchform.cleaned_data['targetorder']
+        freqthreshold = searchform.cleaned_data['freqthreshold']
+        probthreshold = searchform.cleaned_data['probthreshold']
         skip = searchform.cleaned_data['skip']
 
         collection = Collection.objects.get(id=searchform.cleaned_data['collection'][1:])
@@ -61,13 +63,13 @@ def search(request):
 
         if bykeyword:
             #search by keyword
-            sources = Collocation.objects(collection=collection, language=sourcelanguage).search_text(searchform.cleaned_data['text'].lower()).order_by(sourceorder)[skip:skip+MAXSOURCES]
+            sources = Collocation.objects(collection=collection, language=sourcelanguage).search_text(searchform.cleaned_data['text'].lower()).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+MAXSOURCES]
         else:
             #exact search
-            sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).order_by(sourceorder)[skip:skip+MAXSOURCES]
+            sources = Collocation.objects(collection=collection, language=sourcelanguage, text=searchform.cleaned_data['text'].lower()).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+MAXSOURCES]
 
         translationsbysource = defaultdict(list)
-        for translation in Translation.objects(source__in=sources).select_related():
+        for translation in Translation.objects(source__in=sources, prob__gte=probthreshold).select_related():
             translationsbysource[translation.source.id].append(translation)
 
         translations = []
