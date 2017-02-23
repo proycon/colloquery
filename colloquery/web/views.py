@@ -1,3 +1,15 @@
+####################################################
+# Colloquery
+#   by Maarten van Gompel
+#   Centre for Language and Speech Technology
+#   Radboud University Nijmegen
+#
+#  developed for Van Dale
+#
+#  https://github.com/proycon/colloquery
+#  Licensed under AGPLv3
+###################################################
+
 from django.shortcuts import render
 from django.conf import settings
 from django.http import HttpResponseForbidden
