@@ -39,13 +39,15 @@ h1,h2,h3,a {
 
 #searchform ul {
     list-style-type: none;
-    margin: 0px;
-    margin-top: 25px;
     padding: 0px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 25px;
+    width: 60%;
 }
 #searchform ul li {
     width: 100%;
-    text-align: center;
+    text-align: left;
     margin-bottom: 5px;
 }
 label[for="id_text"] {
@@ -54,7 +56,7 @@ label[for="id_text"] {
 #id_text {
     margin-left: auto;
     margin-right: auto;
-    width: 45%;
+    width: 80%;
 }
 
 label {
@@ -62,6 +64,8 @@ label {
     font-variant: small-caps;
     font-size: 90%;
     font-weight: bold;
+    width: 30%;
+    padding-left: 20px;
 }
 input[type="text"] {
     font-size: 120%;
