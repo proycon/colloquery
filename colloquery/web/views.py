@@ -17,7 +17,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from collections import defaultdict
 
-from colloquery.web.models import Collection, Collocation, Translation
+from colloquery.web.models import Collection, Collocation, Translation, stopwords
 from colloquery.web.forms import SearchForm
 
 MAXSOURCES=250
@@ -56,6 +56,7 @@ def search(request):
         targetorder = searchform.cleaned_data['targetorder']
         freqthreshold = searchform.cleaned_data['freqthreshold']
         probthreshold = searchform.cleaned_data['probthreshold']
+        filterstopwords = searchform.cleaned_data['filterstopwords']
         skip = searchform.cleaned_data['skip']
 
         collection = Collection.objects.get(id=searchform.cleaned_data['collection'][1:])
@@ -72,6 +73,7 @@ def search(request):
             sourcelanguage = targetlanguage = collection.sourcelanguage
         elif mode == Mode.TARGETSYN:
             sourcelanguage = targetlanguage = collection.targetlanguage
+
 
         fullquerytext = searchform.cleaned_data['text'].lower()
         searches = []
@@ -99,6 +101,19 @@ def search(request):
             else:
                 #exact search
                 sources = Collocation.objects(collection=collection, language=sourcelanguage, text=querytext).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+MAXSOURCES]
+
+            #filter source-side results with stop words
+            if filterstopwords and sourcelanguage in stopwords:
+                newsources = []
+                for source in sources:
+                    hide = False
+                    for word in source.text.split(' '):
+                        if word in stopwords[sourcelanguage]:
+                            hide = True
+                            break
+                    if not hide:
+                        newsources.append(source)
+                sources = newsources
 
             translationsbysource = defaultdict(list)
             for translation in Translation.objects(source__in=sources, prob__gte=probthreshold).select_related():
