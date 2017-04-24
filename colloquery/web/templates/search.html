@@ -2,6 +2,10 @@
 
 {% block results %}
 
+{% for querytext, translations, noresults in searches %}
+
+<h2>{{ querytext }}</h2>
+
 {% if noresults %}
 <div id="noresults">
     {% if prevlink %}
@@ -42,6 +46,7 @@
 </table>
 {% endif %}
 
+{% if simple %}
 <div id="paginator">
 {% if prevlink %}
 <button onclick="prevpage()">←</button>
@@ -50,5 +55,8 @@
 <button onclick="nextpage()">→</button>
 {% endif %}
 </div>
+{% endif %}
+
+{% endfor %}
 
 {% endblock results %}

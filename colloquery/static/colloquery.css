@@ -47,6 +47,10 @@ h1,h2,h3,a {
     color: #681a1a
 }
 
+h2 {
+    text-align: center;
+}
+
 #searchform ul {
     list-style-type: none;
     padding: 0px;
@@ -140,12 +144,12 @@ table#results {
     text-align: right;
     font-style: italic;
     color: #1d126d;
-}    
+}
 #results tbody td.tfreq {
     text-align: right;
     font-style: italic;
     color: #790303;
-}    
+}
 #results tbody td.prob, #results tbody td.revprob {
     text-align: right;
     font-style: italic;
