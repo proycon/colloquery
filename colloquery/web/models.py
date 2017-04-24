@@ -206,6 +206,11 @@ wasn
 weren
 won
 wouldn
+?
+.
+,
+!
+-
 """.split('\n') if x),
 'nl': set(x for x in """
 de
@@ -309,6 +314,13 @@ uw
 iemand
 geweest
 andere
+?
+.
+-
+,
+!
+z'n
+m'n
 """.split('\n') if x)
 }
 
