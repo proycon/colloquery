@@ -174,3 +174,8 @@ table#results {
     font-size: 110%;
     text-align: center;
 }
+span.helptext {
+    display: block;
+    font-size: 75%;
+    color: #666;
+}
