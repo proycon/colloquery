@@ -82,7 +82,20 @@ def search(request):
 
             if bykeyword:
                 #search by keyword
-                sources = Collocation.objects(collection=collection, language=sourcelanguage).search_text(querytext).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+MAXSOURCES]
+                if '&' in querytext:
+                    for i, queryword in enumerate(querytext.split('&')):
+                        queryword = queryword.strip()
+                        if i == 0:
+                            sources = list(Collocation.objects(collection=collection, language=sourcelanguage).search_text(queryword).filter(freq__gte=freqthreshold).order_by(sourceorder))
+                        else:
+                            secondsources = list(Collocation.objects(collection=collection, language=sourcelanguage).search_text(queryword).filter(freq__gte=freqthreshold))
+                            newsources = []
+                            for source in sources:
+                                if source in secondsources:
+                                    newsources.append(source)
+                            sources = newsources
+                else:
+                    sources = Collocation.objects(collection=collection, language=sourcelanguage).search_text(querytext).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+MAXSOURCES]
             else:
                 #exact search
                 sources = Collocation.objects(collection=collection, language=sourcelanguage, text=querytext).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+MAXSOURCES]
