@@ -38,7 +38,7 @@ except ProgrammingError:
 
 class SearchForm(forms.Form):
     collection = forms.ChoiceField(label="Collection", choices=collectionchoices )
-    text = forms.CharField(widget=forms.TextInput(attrs={'autocomplete' : 'off'}),label="Search terms", max_length=150, help_text="Use a semicolon (;) to seperate multiple queries. Use an ampersand (&) to do searches on a conjunction of multiple keywords")
+    text = forms.CharField(widget=forms.TextInput(attrs={'autocomplete' : 'off'}),label="Search terms", max_length=150, help_text="Use a semicolon (;) to separate multiple queries. Use an ampersand (&) to do searches on a conjunction of multiple keywords")
     bykeyword = forms.BooleanField(label="Search by keyword",initial=True, required=False)
     sourceorder = forms.ChoiceField(label="Source order", choices=[('text','Text'), ('-freq', 'Frequency')],initial='-freq')
     targetorder = forms.ChoiceField(label="Target order", choices=[('text','Text'), ('freq', 'Frequency'),('prob','Translation probability'), ('revprob', 'Reverse probability') ],initial='prob')
