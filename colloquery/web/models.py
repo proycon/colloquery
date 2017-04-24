@@ -275,7 +275,7 @@ nu
 ge
 geen
 omdat
-ietshttps://raw.githubusercontent.com/nltk/nltk_data/gh-pages/packages/corpora/stopwords.zip
+iets
 worden
 toch
 al
