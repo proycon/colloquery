@@ -1,0 +1,3 @@
+"Source","Source frequency","Target","Target frequency","Translation probability","Reverse Translation probability"
+{% spaceless %}{% for querytext, translations, noresults in searches %}{% for translation in translations %}"{{ translation.source.text|safe }}","{{ translation.source.freq }}","{{ translation.target.text|safe }}","{{ translation.target.freq }}","{{ translation.prob|floatformat:2 }}","{{ translation.revprob|floatformat:2 }}"
+{% endfor %}{% endfor %}{% endspaceless %}

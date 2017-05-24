@@ -46,4 +46,5 @@ class SearchForm(forms.Form):
     targetorder = forms.ChoiceField(label="Target order", choices=[('text','Text'), ('freq', 'Frequency'),('prob','Translation probability'), ('revprob', 'Reverse probability') ],initial='prob')
     freqthreshold = forms.IntegerField(label="Frequency threshold", initial=4, min_value=4)
     probthreshold = forms.FloatField(label="Translation probability threshold", initial=0.2, min_value=0.0, max_value=1.0)
+    export = forms.BooleanField(label="Export results to CSV",initial=False, required=False)
     skip = forms.IntegerField(widget=forms.HiddenInput(), initial=0)

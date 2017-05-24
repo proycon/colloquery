@@ -21,6 +21,7 @@ from colloquery.web.models import Collection, Collocation, Translation, stopword
 from colloquery.web.forms import SearchForm
 
 MAXSOURCES=250
+MAXEXPORTSOURCES=100000
 
 
 TARGETSORTFUNCTION = {
@@ -97,6 +98,7 @@ def search(request):
         filterstopwords = searchform.cleaned_data['filterstopwords']
         smartfilter = searchform.cleaned_data['smartfilter']
         skip = searchform.cleaned_data['skip']
+        export = searchform.cleaned_data['export']
 
         collection = Collection.objects.get(id=searchform.cleaned_data['collection'][1:])
 
@@ -116,6 +118,10 @@ def search(request):
 
         fullquerytext = searchform.cleaned_data['text'].lower()
         searches = []
+        if export:
+            maxsources = MAXEXPORTSOURCES
+        else:
+            maxsources = MAXSOURCES
 
         for querytext in fullquerytext.split(';'):
             querytext = querytext.strip()
@@ -136,10 +142,10 @@ def search(request):
                                     newsources.append(source)
                             sources = newsources
                 else:
-                    sources = Collocation.objects(collection=collection, language=sourcelanguage).search_text(querytext).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+MAXSOURCES]
+                    sources = Collocation.objects(collection=collection, language=sourcelanguage).search_text(querytext).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+maxsources]
             else:
                 #exact search
-                sources = Collocation.objects(collection=collection, language=sourcelanguage, text=querytext).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+MAXSOURCES]
+                sources = Collocation.objects(collection=collection, language=sourcelanguage, text=querytext).filter(freq__gte=freqthreshold).order_by(sourceorder)[skip:skip+maxsources]
 
             #filter source-side results with stop words
             if filterstopwords and sourcelanguage in stopwords:
@@ -202,20 +208,19 @@ def search(request):
             searches.append( (querytext, translations, noresults ) )
 
         prevlink = (skip > 0)
-        forwardlink = ((i-skip)>=MAXSOURCES-1)
+        forwardlink = ((i-skip)>=maxsources-1)
 
-
-        return render(request, "search.html", {
+        return render(request, "search.html" if not export else "search.csv", {
             'searchform': searchform,
             'version': settings.VERSION,
             'searches': searches,
             'simple':  len(searches) == 1,
             'prevlink': prevlink,
             'forwardlink': forwardlink,
-            'maxsources': MAXSOURCES,
+            'maxsources': maxsources,
             'collection': collection.id,
             'mode': mode
-        })
+        }, content_type=None if not export else "text/csv")
     else:
         return render(request, "index.html", {
             'searchform': searchform,
