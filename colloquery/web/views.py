@@ -46,6 +46,44 @@ def index(request):
 def sortbuffer(buffer, targetorder):
     return sorted(buffer, key=TARGETSORTFUNCTION[targetorder] )
 
+
+STOPWORDTHRESHOLD = 0.5 #if the ratio of leading + trailing stopwords in the pattern exceeds this, the pattern is pruned by the smart filter
+
+def smartfilter_relevant(source, sourcelanguage):
+    """Determines whether the source collocation is relevant or should be filtered out:
+        Criteria: <Tjerk> Definitie van niet-relevante resultaten is m.i.:
+          - begint met EN eindigt op een hoogfrequent functiewoord (bijv. "the sun on", "the sun in") OF
+          - begint met OF eindigt op een hoofdfrequent functiewoord EN aantal woorden = 2 OF
+          - begint met EN/OF eindigt op meerdere opeenvolgende hoogfrequente functiewoorden (bijv. "on the sun", "is the
+          sun")
+          - daarbij geldt: hoe kleiner het aantal woorden, hoe 'storender' de aanwezigheid van de functiewoorden.
+    """
+    sourcewords = source.text.split(' ')
+    beginisstopword = sourcewords[0] in stopwords[sourcelanguage]
+    endisstopword = sourcewords[-1] in stopwords[sourcelanguage]
+    wordcount = len(sourcewords)
+    #- begint met EN eindigt op een hoogfrequent functiewoord (bijv. "the sun on", "the sun in") OF
+    #- begint met OF eindigt op een hoofdfrequent functiewoord EN aantal woorden = 2 OF
+    if (beginisstopword and endisstopword) or ((beginisstopword or endisstopword) and wordcount == 2):
+        return False
+    elif not beginisstopword and not endisstopword:
+        return True
+
+    #- begint met EN/OF eindigt op meerdere opeenvolgende hoogfrequente functiewoorden (bijv. "on the sun", "is the sun")
+    #- daarbij geldt: hoe kleiner het aantal woorden, hoe 'storender' de aanwezigheid van de functiewoorden.
+    stopwordseq_begin = 0 #number of consecutive leading stopwords
+    for i, word in enumerate(sourcewords):
+        if word in stopwords[sourcelanguage] and i == stopwordseq_begin:
+            stopwordseq_begin += 1
+    stopwordseq_end = 0 #number of consecutive trailing stopwords
+    for i, word in enumerate(reversed(sourcewords)):
+        if word in stopwords[sourcelanguage] and i == stopwordseq_end:
+            stopwordseq_end += 1
+    if (stopwordseq_begin + stopwordseq_end) / wordcount >= STOPWORDTHRESHOLD:
+        return False
+
+    return True
+
 def search(request):
     searchform = SearchForm(request.GET)
 
@@ -57,6 +95,7 @@ def search(request):
         freqthreshold = searchform.cleaned_data['freqthreshold']
         probthreshold = searchform.cleaned_data['probthreshold']
         filterstopwords = searchform.cleaned_data['filterstopwords']
+        smartfilter = searchform.cleaned_data['smartfilter']
         skip = searchform.cleaned_data['skip']
 
         collection = Collection.objects.get(id=searchform.cleaned_data['collection'][1:])
@@ -104,6 +143,7 @@ def search(request):
 
             #filter source-side results with stop words
             if filterstopwords and sourcelanguage in stopwords:
+                #crude filter
                 newsources = []
                 for source in sources:
                     hide = False
@@ -114,6 +154,13 @@ def search(request):
                     if not hide:
                         newsources.append(source)
                 sources = newsources
+            elif smartfilter and sourcelanguage in stopwords:
+                newsources = []
+                for source in sources:
+                    if smartfilter_relevant(source, sourcelanguage):
+                        newsources.append(source)
+                sources = newsources
+
 
             translationsbysource = defaultdict(list)
             for translation in Translation.objects(source__in=sources, prob__gte=probthreshold).select_related():
