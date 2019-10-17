@@ -1,0 +1,87 @@
+{
+    "@context": [
+        "https://doi.org/10.5063/schema/codemeta-2.0",
+        "http://schema.org",
+        {
+            "entryPoints": { "@reverse": "schema:actionApplication" },
+            "interfaceType": { "@id": "codemeta:interfaceType" }
+        }
+    ],
+    "@type": "SoftwareSourceCode",
+    "identifier": "colloquery",
+    "name": "Colloquery",
+    "version": "0.1.1",
+    "description": "Web application for searching for phrases/collocations/synonyms in phrase translation tables",
+    "license": "AGPL-3.0-or-later",
+	"url": "https://github.com/proycon/colloquery",
+    "producer": {
+        "@id": "https://www.ru.nl/clst",
+        "@type": "Organization",
+        "name": "Centre for Language and Speech Technology",
+        "url": "https://www.ru.nl/clst",
+        "parentOrganization": {
+            "@id": "https://www.ru.nl/cls",
+            "@type": "Organization",
+            "name": "Centre for Language Studies",
+            "url": "https://www.ru.nl/cls",
+            "parentOrganization": {
+                "@id": "https://www.ru.nl",
+                "name": "Radboud University",
+                "@type": "Organization",
+                "url": "https://www.ru.nl",
+                "location": {
+                    "@type": "Place",
+                    "name": "Nijmegen"
+                }
+            }
+
+        }
+    },
+    "author": [
+		{
+			"@id": "https://orcid.org/0000-0002-1046-0006",
+			"@type": "Person",
+			"givenName": "Maarten",
+			"familyName": "van Gompel",
+			"email": "proycon@anaproy.nl",
+			"affiliation": { "@id": "https://www.ru.nl/clst" }
+		}
+	],
+	"sourceOrganization": { "@id": "https://www.ru.nl/clst" },
+	"programmingLanguage": {
+		"@type": "ComputerLanguage",
+		"identifier": "python",
+		"name": "python"
+	},
+	"operatingSystem": "POSIX",
+	"codeRepository": "https://github.com/proycon/colloquery",
+    "softwareRequirements": [
+        {
+			"@type": "SoftwareApplication",
+			"identifier": "django",
+			"name": "django"
+		}
+	],
+	"funder": [
+		{
+			"@type": "Organization",
+			"name": "Van Dale",
+			"url": "https://www.vandale.nl"
+		}
+	],
+	"readme": "https://github.com/proycon/colloquery/blob/master/README.rst",
+	"issueTracker": "https://github.com/proycon/colloquery/issues",
+	"releaseNotes": "https://github.com/proycon/colloquery/releases",
+	"developmentStatus": "inactive",
+	"keywords":  [ "nlp", "natural language processing", "machine translation", "collocations", "translation" ],
+	"dateCreated": "2017-01-29",
+    "entryPoints": [
+        {
+            "@type": "EntryPoint",
+            "name": "colloquery",
+            "urlTemplate": "https://colloquery.science.ru.nl",
+            "description": "Web-application",
+            "interfaceType": "WUI"
+        }
+    ]
+}
