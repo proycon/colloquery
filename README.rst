@@ -1,8 +1,15 @@
+.. image:: http://applejack.science.ru.nl/lamabadge.php/colloquery
+   :target: http://applejack.science.ru.nl/languagemachines/
+
+.. image:: https://www.repostatus.org/badges/latest/inactive.svg
+   :alt: Project Status: Inactive – The project has reached a stable, usable state but is no longer being actively developed; support/maintenance will be provided as time allows.
+   :target: https://www.repostatus.org/#inactive
+
 Colloquery
 ============
 
 Colloquery is a web application to search for phrase translations, or
-collocations, as well as synonyms,in bilingual phrase translation tables. 
+collocations, as well as synonyms,in bilingual phrase translation tables.
 
 It is developed for `Van Dale <http://vandale.nl>`_ by the `Centre for Language
 and Speech Technology <http://www.ru.nl/clst>`_, Radboud University Nijmegen, and is licensed under the
@@ -20,7 +27,7 @@ First, clone this repository and edit ``settings.py``.
 Colloquery is not trivial to set-up and train, as it relies on numerous
 external dependencies:
 
-* Python 3 
+* Python 3
 * `MongoDB <https://mongodb.com>`_
 * `mongoengine <http://mongoengine.org>`_
 * `Django <https://djangoproject.com>`_
